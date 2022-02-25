@@ -93,6 +93,7 @@ AviviD.LikrEventTrackingSendCoupon = function(){
     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
     let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
     let fb_id = AviviD.get_cookie_tracking('_fbp');
+    let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
     let coupon_info = {
         "p_p"   : AviviD.addFan.AviviD_prob_p,
         "c_t"   : AviviD.addFan.coupon_title,
@@ -113,7 +114,7 @@ AviviD.LikrEventTrackingSendCoupon = function(){
         'timestamp'         : Date.now(),
         "behavior_type"     : "likrTracking",
         'event_type'        : "sendCoupon",
-        "coupon"            : AviviD.is_coupon,
+        "coupon"            : is_coupon,
         'record_user'       : AviviD.record_user,
         "coupon_info"       : coupon_info,
     };
@@ -128,6 +129,7 @@ AviviD.LikrEventTrackingAcceptCoupon = function(){
     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
     let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
     let fb_id = AviviD.get_cookie_tracking('_fbp');
+    let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
     let coupon_info = {
         "p_p"   : AviviD.addFan.AviviD_prob_p,
         "c_t"   : AviviD.addFan.coupon_title,
@@ -149,7 +151,7 @@ AviviD.LikrEventTrackingAcceptCoupon = function(){
         'timestamp'         : Date.now(),
         "behavior_type"     : "likrTracking",
         'event_type'        : "acceptCoupon",
-        "coupon"            : AviviD.is_coupon,
+        "coupon"            : is_coupon,
         'record_user'       : AviviD.record_user,
         "coupon_info"       : coupon_info,
     };
@@ -164,6 +166,7 @@ AviviD.LikrEventTrackingDiscardCoupon = function(){
     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
     let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
     let fb_id = AviviD.get_cookie_tracking('_fbp');
+    let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
     let coupon_info = {
         "p_p"   : AviviD.addFan.AviviD_prob_p,
         "c_t"   : AviviD.addFan.coupon_title,
@@ -185,7 +188,7 @@ AviviD.LikrEventTrackingDiscardCoupon = function(){
         'timestamp'         : Date.now(),
         "behavior_type"     : "likrTracking",
         'event_type'        : "discardCoupon",
-        "coupon"            : AviviD.is_coupon,
+        "coupon"            : is_coupon,
         'record_user'       : AviviD.record_user,
         "coupon_info"       : coupon_info,
     };
@@ -207,23 +210,20 @@ AviviD.fetch_coupon_status(AviviD.web_id)
     AviviD.check_allow_coupon_by_customer_type = function() {
         let check_bool = (AviviD.addFan.coupon_customer_type==1 && AviviD.record_user.i_pb==1)? false : true;
         return check_bool;
-    };
-    // AviviD.addFan.coupon_status = 1; // 0: no avialiable coupon, 1: yes
-    // AviviD.addFan.coupon_id = 10; // use to get coupon information
-    // AviviD.addFan.coupon_customer_type = 0; // 0: all, 1: exclude is_purchase_brfore=1    
+    }; 
 })
 ////B. if coupon status=true, do something, else, do nothing
 .then(() => { 
     console.log('status: '+AviviD.addFan.coupon_status);
     if (AviviD.addFan.coupon_status) { // coupon enable
-        AviviD.addFan.AviviD_is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
-        AviviD.addFan.AviviD_is_coupon_b = ( AviviD.get_cookie_tracking('AviviD_is_coupon_b')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon_b') : 0;
+        AviviD.addFan.AviviD_is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_coupon')) : 0;
+        AviviD.addFan.AviviD_is_coupon_b = ( AviviD.get_cookie_tracking('AviviD_is_coupon_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_coupon_b')) : 0;
         AviviD.addFan.AviviD_prob_p = ( AviviD.get_cookie_tracking('AviviD_prob_p')!=="NaN" ) ? parseFloat(AviviD.get_cookie_tracking('AviviD_prob_p')) : 0;
-        
-        // force to show coupon
-        AviviD.addFan.AviviD_is_coupon = 1;
-        AviviD.addFan.AviviD_is_coupon_b = 1;
-
+        if (AviviD.get_urlparam('avivid_preview_coupon')==1) {
+            //// force to show coupon
+            AviviD.addFan.AviviD_is_coupon = 1;
+            AviviD.addFan.AviviD_is_coupon_b = 1;
+        };
         ////C. check is_coupon cookies and customer_type
         if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0 && AviviD.check_allow_coupon_by_customer_type()) {
             //// D.call API to fetch model parameters
@@ -234,18 +234,13 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                 AviviD.addFan.model_keys = data_model.model_key_js.split(',');                
                 AviviD.addFan.model_parameters = data_model.model_value.split(',').map(x => parseFloat(x));
                 AviviD.addFan.model_intercept = data_model.model_intercept;
-                // AviviD.addFan.lower_bound = 0.40;
-                // AviviD.addFan.upper_bound = 0.817847;
-                // AviviD.addFan.model_keys = ['ps','t_p_t','c_c_t','i_ac','i_rc'];
-                // AviviD.addFan.model_parameters = [0.02788,0.00051,-0.00144,3.12283,1.22228];
-                // AviviD.addFan.model_intercept = -5.59731;
             })
             ////E. compute probability of purchase
             .then(() => {
                 AviviD.get_model_X = function(record_user, keys) {
                     var values = [];
                     for (let i=0; i<keys.length; i++) {
-                        values.push(record_user[keys[i]]);
+                        values.push(parseInt(record_user[keys[i]]));
                     };
                     return values;
                 };
@@ -279,7 +274,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
 
             }); //// D.call API to fetch model parameters      
         //// F. get coupon details(API)
-        } else if (AviviD.addFan.AviviD_is_coupon_b==1 && AviviD.addFan.AviviD_is_coupon==1) { // show coupon
+        } else if (AviviD.addFan.AviviD_is_coupon_b==1 && AviviD.addFan.AviviD_is_coupon==1) { // show coupon both 1 (do not show when AviviD_is_coupon==2)
             // 1.call API to fetch coupon information, key: web_id, coupon_enable=1, coupon_delete=0, today>=start_time and today<=end_time
             AviviD.fetch_addFan_coupon_detials(AviviD.addFan.coupon_id)
             .then((coupon_details) => {
@@ -292,6 +287,9 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                 AviviD.addFan.coupon_code_mode = coupon_details.coupon_code_mode; // 0:單一, 1:批量
 
                 AviviD.addFan.link_code = coupon_details.link_code; // link code to join two tables
+
+                AviviD.addFan.coupon_limit = coupon_details.coupon_limit; // limit-amount,limit-account,limit-order,limit-return,limit-bill=1000
+
                 // 2.if 批量code, call API to update is_send accroding to coupon_code
                 if (AviviD.addFan.coupon_code_mode==1) {
                     AviviD.update_addFan_coupon_is_send(AviviD.addFan.link_code, AviviD.addFan.coupon_code);
@@ -324,8 +322,29 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                     };
                     AviviD.clickToClipboard_info();
 
+                    AviviD.appendCouponLimit = function(coupon_limit){
+                        var alert_div_1 = `<span>．折扣碼每人限領一次</span>`
+                        var alert_div_2 = `<span>．每筆訂單限使用一組折扣碼</span>`
+                        var alert_div_3 = `<span>．若有訂單退貨，優惠金額將一併扣除，不予退款</span>`
+                        var alert_div_4 = `<span>．最低金額消費需達到`
+                        var coupon_limit_array = coupon_limit.split(',');
+                        for (let i=0; i<coupon_limit_array.length; i++) {
+                            let limit = coupon_limit_array[i];
+                            if (limit==='limit-account') {
+                                jQuery('.avivid_coupon_alert').append(alert_div_1)
+                            } else if (limit==='limit-order') {
+                                jQuery('.avivid_coupon_alert').append(alert_div_2);
+                            } else if (limit==='limit-return') {
+                                jQuery('.avivid_coupon_alert').append(alert_div_3);
+                            } else if (limit.includes('limit-bill')) {
+                                let limit_bill = limit.split('=')[1];
+                                alert_div_4 += limit_bill + `元</span>`;
+                                jQuery('.avivid_coupon_alert').append(alert_div_4);
+                            };
+                        };    
+                    };
                     //// load main for coupon
-                    AviviD.Promotion_coupons = function(title, content, code, timeset, mode=0){
+                    AviviD.Promotion_coupons = function(title, content, code, timeset, limit, mode=0){
                         var coupon_css =
                         `<style>
                             @media (orientation:portrait) {
@@ -835,7 +854,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                                     <img src="https://rhea-cache.advividnetwork.com/coupon/Frame_40.png" class = "coupon_backgroud">          
                                     
                                     <div class='avivid_coupon_title'>
-                                        <div>`+title+`</div>
+                                    <div>`+title+`</div>
 
                                     </div>
                                     <div class='avivid_coupon_description'>`+content+`</div>
@@ -843,9 +862,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                                     <div class='avivid_coupon_code'>`+code+`</div>
                                     <div class='avivid_coupon_help'>請在購物車頁面「請輸入優惠碼」中輸入以上折扣代碼</div>
                                     <div class='avivid_coupon_sep'></div>
-                                
-
-
+                                    <div class='avivid_coupon_alert'></div>                    
 
                                     <div id = 'main_reciprocal' style = 'margin-bottom: 55px;display:none;'>
                                         <span>優惠倒數：</span>
@@ -899,26 +916,14 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                                 </div>
                             </div>
                         `;
-
                         var time_limit_div = `<div>(`+timeset+` mins)</div>`;
 
-                        var alert_div = 
-                        `
-                                    <div class='avivid_coupon_alert'>
-                                        <span>．限時30分鐘內結帳使用</span>                        
-                                        <span>．折扣碼數量有限欲完為止</span>                        
-                                        <span>．折扣碼每人限使用一次</span>                        
-                                        <span>．每筆訂單限使用一組折扣碼</span>                        
-                                        <span>．若有訂單退貨，折扣碼金額將一併扣除，不予補發</span>
-                                    </div>
-                        `;
                         jQuery('head').append(coupon_css);
                         jQuery('body').append(main_div);
+                        //// append coupon_limit if existing
+                        AviviD.appendCouponLimit(limit);
                         if (timeset!=0) { // 限時
                             jQuery('.avivid_coupon_title').append(time_limit_div);
-                            jQuery('.avivid_coupon_position').append(alert_div);
-                        } else { // 無限時
-                            jQuery('.avivid_coupon_position').append(alert_div);
                         };
                         if (mode==1) { // 小鬧鐘
                             //// go to next page or click multiple times at the same page, hide main page, show secondary page
@@ -940,8 +945,6 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                         return num < 10 ? "0" + num : num; 
                     };
                     AviviD.startCountDown = function(){
-                        // AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? duration : AviviD.addFan.AviviD_c_t_r;
-                        // AviviD.addFan.AviviD_c_t_r
                         let secondsprogress = (AviviD.addFan.AviviD_c_t_r+1) / 10;
                         let originsec = AviviD.addFan.AviviD_c_t_r+1;
                         let i = 1;
@@ -963,8 +966,8 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                                 i ++;
                             };
                             AviviD.addFan.AviviD_c_t_r--;
-                            //// end of counter and coupon
-                            if (AviviD.addFan.AviviD_c_t_r <= 0) { 
+                            //// end of counter and coupon, should in counting mode (AviviD_is_coupon==1, !=2)
+                            if (AviviD.addFan.AviviD_c_t_r <= 0 && AviviD.addFan.AviviD_is_coupon==1) { 
                                 // 1.clear counter
                                 clearInterval(AviviD.addFan.countInterval);
                                 // 2.remove counter UI
@@ -988,49 +991,99 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                         });
                     };
                     AviviD.AcceptCoupon = function(click_mode=true){
-                        //// initialize for AviviD.startCountDown()
-                        AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? 60*AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r;
-                        AviviD.addFan.AviviD_c_t_r_min = typeof(AviviD.addFan.AviviD_c_t_r_min)==='undefined' ? AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r_min;
-                        AviviD.addFan.AviviD_c_t_r_sec = typeof(AviviD.addFan.AviviD_c_t_r_sec)==='undefined' ? 0 : AviviD.addFan.AviviD_c_t_r_sec;
-                        //// check if trigger sendCoupon event
-                        if (AviviD.addFan.AviviD_c_t_r==60*AviviD.addFan.coupon_setTimer) { // first time to accept
-                            // 1.send triggered acceptCoupon event
-                            AviviD.LikrEventTrackingAcceptCoupon();
-                        } else {
-                            // do nothing
-                        };
-                        //// copy coupon code to clipboard
-                        if (click_mode) {
-                            AviviD.ClickToClipboard(AviviD.addFan.coupon_code);
-                        };
-                        //// for timer=0 setting
-                        if (AviviD.addFan.coupon_setTimer==0) {// no timer setting
-                            jQuery('.main_page').hide();                
-                        } else { // show secondary page and timer
-                            setTimeout(()=>{
-                                jQuery('.main_page').hide();
-                                jQuery('#secondary_page').show();
-                                jQuery('#receive_button').attr('onclick', 'AviviD.show_secondary_page()');
-                                jQuery('#main_reciprocal').show();
-                                jQuery('#secondary_reciprocal').show();    
-                                AviviD.startCountDown();    
-                                AviviD.sleep(4000).then(() => {
-                                    jQuery('#gif').hide();
-                                    AviviD.sleep(3000).then(() => {
-                                        jQuery('#gif').show();
-                                        AviviD.sleep(4000).then(() => {
-                                            jQuery('#gif').hide();
-                                            AviviD.sleep(3000).then(() => {
-                                                jQuery('#gif').show();
-                                                AviviD.sleep(4000).then(() => {
-                                                    jQuery('#gif').hide();                             
+                        //// change cookie when without time limit
+                        if (AviviD.addFan.coupon_setTimer==0) { // without time limit
+                            AviviD.addFan.AviviD_is_coupon = 2;
+                            AviviD.addFan.AviviD_is_coupon_b = 1;
+                            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); // continue session
+                            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
+                            jQuery('.main_page').hide();
+                        } else { // with time limit
+                            //// initialize for AviviD.startCountDown()
+                            AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? 60*AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r;
+                            AviviD.addFan.AviviD_c_t_r_min = typeof(AviviD.addFan.AviviD_c_t_r_min)==='undefined' ? AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r_min;
+                            AviviD.addFan.AviviD_c_t_r_sec = typeof(AviviD.addFan.AviviD_c_t_r_sec)==='undefined' ? 0 : AviviD.addFan.AviviD_c_t_r_sec;
+                            //// check if trigger sendCoupon event
+                            if (AviviD.addFan.AviviD_c_t_r==60*AviviD.addFan.coupon_setTimer) { // first time to accept
+                                // 1.send triggered acceptCoupon event
+                                AviviD.LikrEventTrackingAcceptCoupon();
+                            };
+                            //// copy coupon code to clipboard
+                            if (click_mode) {
+                                AviviD.ClickToClipboard(AviviD.addFan.coupon_code);
+                            };
+                            //// for timer=0 setting
+                            if (AviviD.addFan.coupon_setTimer==0) {// no timer setting
+                                jQuery('.main_page').hide();                
+                            } else { // show secondary page and timer
+                                setTimeout(()=>{
+                                    jQuery('.main_page').hide();
+                                    jQuery('#secondary_page').show();
+                                    jQuery('#receive_button').attr('onclick', 'AviviD.show_secondary_page()');
+                                    jQuery('#main_reciprocal').show();
+                                    jQuery('#secondary_reciprocal').show(); 
+                                    // start counting   
+                                    AviviD.startCountDown();    
+                                    AviviD.sleep(4000).then(() => {
+                                        jQuery('#gif').hide();
+                                        AviviD.sleep(3000).then(() => {
+                                            jQuery('#gif').show();
+                                            AviviD.sleep(4000).then(() => {
+                                                jQuery('#gif').hide();
+                                                AviviD.sleep(3000).then(() => {
+                                                    jQuery('#gif').show();
+                                                    AviviD.sleep(4000).then(() => {
+                                                        jQuery('#gif').hide();                             
+                                                    });
                                                 });
                                             });
                                         });
                                     });
-                                });
-                            },800);
+                                },800);
+                            };
                         };
+                        // //// initialize for AviviD.startCountDown()
+                        // AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? 60*AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r;
+                        // AviviD.addFan.AviviD_c_t_r_min = typeof(AviviD.addFan.AviviD_c_t_r_min)==='undefined' ? AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r_min;
+                        // AviviD.addFan.AviviD_c_t_r_sec = typeof(AviviD.addFan.AviviD_c_t_r_sec)==='undefined' ? 0 : AviviD.addFan.AviviD_c_t_r_sec;
+                        // //// check if trigger sendCoupon event
+                        // if (AviviD.addFan.AviviD_c_t_r==60*AviviD.addFan.coupon_setTimer) { // first time to accept
+                        //     // 1.send triggered acceptCoupon event
+                        //     AviviD.LikrEventTrackingAcceptCoupon();
+                        // }
+                        // //// copy coupon code to clipboard
+                        // if (click_mode) {
+                        //     AviviD.ClickToClipboard(AviviD.addFan.coupon_code);
+                        // };
+                        // //// for timer=0 setting
+                        // if (AviviD.addFan.coupon_setTimer==0) {// no timer setting
+                        //     jQuery('.main_page').hide();                
+                        // } else { // show secondary page and timer
+                        //     setTimeout(()=>{
+                        //         jQuery('.main_page').hide();
+                        //         jQuery('#secondary_page').show();
+                        //         jQuery('#receive_button').attr('onclick', 'AviviD.show_secondary_page()');
+                        //         jQuery('#main_reciprocal').show();
+                        //         jQuery('#secondary_reciprocal').show(); 
+                        //         // start counting   
+                        //         AviviD.startCountDown();    
+                        //         AviviD.sleep(4000).then(() => {
+                        //             jQuery('#gif').hide();
+                        //             AviviD.sleep(3000).then(() => {
+                        //                 jQuery('#gif').show();
+                        //                 AviviD.sleep(4000).then(() => {
+                        //                     jQuery('#gif').hide();
+                        //                     AviviD.sleep(3000).then(() => {
+                        //                         jQuery('#gif').show();
+                        //                         AviviD.sleep(4000).then(() => {
+                        //                             jQuery('#gif').hide();                             
+                        //                         });
+                        //                     });
+                        //                 });
+                        //             });
+                        //         });
+                        //     },800);
+                        // };
                     };
 
                     AviviD.show_main_page = function(){
@@ -1069,7 +1122,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                         AviviD.addFan.AviviD_c_t_r = 0;
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,0.01);
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
-                        AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.1);
+                        AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.01);
                         // 2.remove coupon
                         clearInterval(AviviD.addFan.countInterval);
                         jQuery('.main_page').remove();
@@ -1078,30 +1131,61 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                         AviviD.LikrEventTrackingDiscardCoupon();
                     };
 
+                    if (AviviD.platform_int===2 | AviviD.platform_int==3) {
+                        AviviD.event.leave = "pagehide"
+                    } else {
+                        AviviD.event.leave = "beforeunload"
+                    };
                     //// to record coupon time remaining
                     window.addEventListener(AviviD.event.leave, function (e) {
-                        if (AviviD.addFan.AviviD_is_coupon===1 && typeof(AviviD.addFan.AviviD_c_t_r)!=='undefined'){
-                            //// save coupon remaining time(s)
+                        // AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30);
+                        if (AviviD.get_cookie_tracking('AviviD_is_coupon')!="NaN"){ // cookie exitsting, continue refresh cookie for tracking
+                            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30);
+                        };
+                        if (AviviD.addFan.AviviD_is_coupon===1 && typeof(AviviD.addFan.AviviD_c_t_r)!=='undefined'){ // counting mode
                             AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,AviviD.addFan.AviviD_c_t_r/60);
-                            console.log('save coupon timer remaining time to cookie')
-                        }
+                            console.log('save coupon timer remaining time to cookie');
+                            // refresh AviviD_is_coupon cookie if in sending coupon mode
+                            // AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); //session-based
+                            // if (typeof(AviviD.addFan.AviviD_c_t_r)!=='undefined') { // AviviD_c_t_r existing (assign AviviD_c_t_r when accept coupon)
+                            //     //// save coupon remaining time(s)
+                            //     // AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,AviviD.addFan.AviviD_c_t_r/60);
+                            //     // console.log('save coupon timer remaining time to cookie');
+                            //     if (AviviD.addFan.AviviD_c_t_r!==0) { // normal counting mode
+                            //         AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,AviviD.addFan.AviviD_c_t_r/60);
+                            //         console.log('save coupon timer remaining time to cookie')
+                            //     } 
+                            //     // else { // zero, no limit case, end coupon (click to disappear)
+                            //     //     // AviviD.addFan.AviviD_is_coupon = 1; // 0:don't send, 1:send coupon with timer, 2:send coupon without timer
+                            //     //     AviviD.addFan.AviviD_is_coupon_b = 1;
+                            //     //     AviviD.addFan.AviviD_c_t_r = 0;
+                            //     //     // AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,0.01);
+                            //     //     // AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30);
+                            //     //     AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
+                            //     //     AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0);
+                            //     //     console.log('save coupon timer remaining time to cookie');
+                            //     // };
+                            // };
+                            //// save coupon remaining time(s)
+                            // AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); //session-based
+                            // AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,AviviD.addFan.AviviD_c_t_r/60);
+                            // console.log('save coupon timer remaining time to cookie');
+                        };
                     });
 
-                    //// check AviviD_c_t_r(coupon time remaining)
+                    //// check AviviD_c_t_r(coupon time remaining) and initialize AviviD.addFan.AviviD_c_t_r when in counting mode
                     AviviD.addFan.AviviD_c_t_r = ( AviviD.get_cookie_tracking('AviviD_c_t_r')!="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_c_t_r')) : AviviD.addFan.AviviD_c_t_r;
                     if (typeof(AviviD.addFan.AviviD_c_t_r)==='undefined') {
-                        //// first time to accept coupon      
-                        // 1.show coupon
-                        AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, 0);
-                        // 2.to record trigger
+                        //// first time to accept coupon
+                        // 1.show coupon (main page)
+                        AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, AviviD.addFan.coupon_limit, 0);
 
                     } else {
                         //// time remaining >= 0, next page or click multiple times at one page case
                         // 1.directly show secondary page
-                        AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, 1);
+                        AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, AviviD.addFan.coupon_limit, 1);
                     };
-                }; //// check coupon_code is not null 
-                
+                }; //// check coupon_code is not null                 
             });
         } else { ////F. get coupon details(API)
             //// do nothing (trival case)

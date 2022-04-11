@@ -259,7 +259,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
         ////C. check is_coupon cookies and customer_type
         if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0 && AviviD.check_allow_coupon_by_customer_type()) {
             //// D.call API to fetch model parameters
-            AviviD.fetch_addFan_coupon_model2(AviviD.web_id, AviviD.coupon_id)
+            AviviD.fetch_addFan_coupon_model2(AviviD.web_id, AviviD.addFan.coupon_id)
             .then((data_model) =>{
                 AviviD.addFan.lower_bound = data_model.lower_bound;
                 AviviD.addFan.upper_bound = data_model.upper_bound;
@@ -586,7 +586,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                                     top: 122vw;
 
                                     border: 1px dashed #606060;
-                                    transform: rotate(0.65deg);
+                                    /*transform: rotate(0.65deg);*/
                                 }
 
                                 .avivid_coupon_alert{
@@ -836,7 +836,7 @@ AviviD.fetch_coupon_status(AviviD.web_id)
                                     left: 30vw;
                                     top: 69vw;
                                     border: 1px dashed #606060;
-                                    transform: rotate(0.65deg);
+                                    /*transform: rotate(0.65deg);*/
                                 }
 
                                 .avivid_coupon_alert{
@@ -1158,8 +1158,456 @@ AviviD.fetch_coupon_status(AviviD.web_id)
     } else { //do nothing
         console.log('no avilable coupon');
     };
-});//// A. call API to check coupon status, customer_type(0:all, 1:only new)
+})//// A. call API to check coupon status, customer_type(0:all, 1:only new)
+.then (()=>{ // addfan ad
+    //// API to give the highest prioity ad ranked by remaining days
+    AviviD.fetch_ad_status = async function(web_id) {
+        return new Promise((resolve, reject) => {
+            let url = 'https://rhea-cache.advividnetwork.com/api/coupon/ad_status'; // https://rhea-cache.advividnetwork.com/api/
+            jQuery.ajax({
+                type: 'GET',
+                url: url,
+                cache: true,
+                dataType: 'json',
+                data: {
+                    'web_id': web_id
+                },
+                success: function (result) {
+                    resolve(result)
+                },
+                fail: function (xhr, ajaxOptions, thrownError) {
+                    reject(false)
+                },
+            });
+        });
+    };
+    //// API to give model for sending afad
+    AviviD.fetch_addFan_ad_model = async function(web_id, coupon_id) {
+        return new Promise((resolve, reject) => {
+            let url = 'https://rhea-cache.advividnetwork.com/api/coupon/model2'; // https://rhea-cache.advividnetwork.com/api/
+            jQuery.ajax({
+                type: 'GET',
+                url: url,
+                cache: true,
+                dataType: 'json',
+                data: {
+                    'web_id': web_id,
+                    'coupon_id': coupon_id
+                },
+                success: function (result) {
+                    resolve(result)
+                },
+                fail: function (xhr, ajaxOptions, thrownError) {
+                    reject(false)
+                },
+            })
+        })
+    };
 
+    //// API to give ad details (use ad id)
+    AviviD.fetch_addFan_ad_detials = async function(ad_id) {
+        return new Promise((resolve, reject) => {
+            let url = 'https://rhea-cache.advividnetwork.com/api/coupon/ad_details'; // https://rhea-cache.advividnetwork.com/api/
+            jQuery.ajax({
+                type: 'GET',
+                url: url,
+                cache: true,
+                dataType: 'json',
+                data: {
+                    'ad_id': ad_id
+                },
+                success: function (result) {
+                    resolve(result)
+                },
+                fail: function (xhr, ajaxOptions, thrownError) {
+                    reject(false)
+                },
+            });
+        });
+    };
+
+    AviviD.check_allow_addfan = function() {
+        if (AviviD.get_urlparam('avivid_preview_afad')==1) {
+            //// force to show addfan
+            return true;
+        } else {
+            return AviviD.addFan.AviviD_is_coupon!=0 && AviviD.record_user.ps>=3;
+        };
+    };
+
+    AviviD.LikrEventTrackingSendAfAd = function(){
+        let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
+        let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+        let fb_id = AviviD.get_cookie_tracking('_fbp');
+        let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
+        let afad_info = {
+            "p_p"   : AviviD.addFan.AviviD_prob_p,
+            "l_b"   : AviviD.addFan.lower_bound,
+            "u_b"   : AviviD.addFan.upper_bound,
+            "m_k"   : AviviD.addFan.model_keys,
+            "m_p"   : AviviD.addFan.model_parameters,
+            "m_i"   : AviviD.addFan.model_intercept,
+            "m_X"   : AviviD.addFan.model_X,
+            "a_i"   : AviviD.addFan.ad_id,
+            "w_t"   : AviviD.addFan.website_type,
+        };
+        let tracking_data = {
+            'web_id'            : AviviD.web_id,
+            'uuid'              : uuid,
+            'ga_id'             : ga_id,
+            'fb_id'             : fb_id,
+            'timestamp'         : Date.now(),
+            "behavior_type"     : "likrTracking",
+            'event_type'        : "sendAfAd",
+            "coupon"            : is_coupon,
+            'record_user'       : AviviD.record_user,
+            "afad_info"         : afad_info,
+        };
+        //// don't send if in preview mode
+        if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
+            AviviD.tracking_data_aws_put.construct(tracking_data);
+            console.log("trigger sendAfAd event");
+        };
+    };
+
+    AviviD.LikrEventTrackingAcceptAd = function(){
+        let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
+        let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+        let fb_id = AviviD.get_cookie_tracking('_fbp');
+        let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
+        let afad_info = {
+            "p_p"   : AviviD.addFan.AviviD_prob_p,
+            "a_i"   : AviviD.addFan.ad_id,
+            "w_t"   : AviviD.addFan.website_type,
+
+        };
+        let tracking_data = {
+            'web_id'            : AviviD.web_id,
+            'uuid'              : uuid,
+            'ga_id'             : ga_id,
+            'fb_id'             : fb_id,
+            'timestamp'         : Date.now(),
+            "behavior_type"     : "likrTracking",
+            'event_type'        : "acceptAd",
+            "coupon"            : is_coupon,
+            'record_user'       : AviviD.record_user,
+            "afad_info"         : afad_info,
+        };
+        //// don't send if in preview mode
+        if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
+            AviviD.tracking_data_aws_put.construct(tracking_data);
+            console.log("trigger acceptAd event");
+        };
+    };
+
+    AviviD.LikrEventTrackingAcceptAf = function(){
+        let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
+        let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+        let fb_id = AviviD.get_cookie_tracking('_fbp');
+        let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
+        let afad_info = {
+            "p_p"   : AviviD.addFan.AviviD_prob_p,
+            "a_i"   : AviviD.addFan.ad_id,
+            "w_t"   : AviviD.addFan.website_type,
+
+        };
+        let tracking_data = {
+            'web_id'            : AviviD.web_id,
+            'uuid'              : uuid,
+            'ga_id'             : ga_id,
+            'fb_id'             : fb_id,
+            'timestamp'         : Date.now(),
+            "behavior_type"     : "likrTracking",
+            'event_type'        : "acceptAf",
+            "coupon"            : is_coupon,
+            'record_user'       : AviviD.record_user,
+            "afad_info"         : afad_info,
+        };
+        //// don't send if in preview mode
+        if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
+            AviviD.tracking_data_aws_put.construct(tracking_data);
+            console.log("trigger acceptAf event");
+        };
+    };
+
+    AviviD.LikrEventTrackingDiscardAfAd = function(){
+        let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
+        let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+        let fb_id = AviviD.get_cookie_tracking('_fbp');
+        let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
+        let afad_info = {
+            "p_p"   : AviviD.addFan.AviviD_prob_p,
+            "a_i"   : AviviD.addFan.ad_id,
+            "w_t"   : AviviD.addFan.website_type,
+        };
+        let tracking_data = {
+            'web_id'            : AviviD.web_id,
+            'uuid'              : uuid,
+            'ga_id'             : ga_id,
+            'fb_id'             : fb_id,
+            'timestamp'         : Date.now(),
+            "behavior_type"     : "likrTracking",
+            'event_type'        : "discardAfAd",
+            "coupon"            : is_coupon,
+            'record_user'       : AviviD.record_user,
+            "afad_info"         : afad_info,
+        };
+        //// don't send if in preview mode
+        if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
+            AviviD.tracking_data_aws_put.construct(tracking_data);
+            console.log("trigger discardAfAd event");
+        };
+    };
+
+    //// 1. check available ad, if not sending coupon
+    if (AviviD.check_allow_addfan()) {
+        AviviD.fetch_ad_status(AviviD.web_id)
+        .then((data_status)=>{
+            AviviD.addFan.ad_status = data_status.status; // 0: no available ad, 1: yes
+            AviviD.addFan.ad_id = data_status.id; // use to get ad information
+            AviviD.addFan.website_type = data_status.website_type; // 0:normal, 1: one-page ecom
+
+            if (AviviD.get_urlparam('avivid_preview_afad')==1) {
+                //// force to show coupon
+                AviviD.addFan.AviviD_is_addfan_b = 0;
+                AviviD.addFan.ad_status = true;
+                AviviD.addFan.ad_id = 76;
+            } else {
+                //// normal case
+                AviviD.addFan.AviviD_is_addfan_b = ( AviviD.get_cookie_tracking('AviviD_is_addfan_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_addfan_b')) : 0;
+            };
+        })
+        .then(()=>{ 
+            if (AviviD.addFan.ad_status && AviviD.addFan.AviviD_is_addfan_b==0) {
+                AviviD.fetch_addFan_ad_model(AviviD.web_id, AviviD.addFan.ad_id)
+                .then((data_model) => {
+                    AviviD.addFan.lower_bound = data_model.lower_bound;
+                    AviviD.addFan.upper_bound = data_model.upper_bound;
+                    AviviD.addFan.model_keys = data_model.model_key_js.split(',');
+                    AviviD.addFan.model_parameters = data_model.model_value.split(',').map(x => parseFloat(x));
+                    AviviD.addFan.model_intercept = data_model.model_intercept;
+                })
+                .then(()=>{
+                    AviviD.get_model_X = function(record_user, keys) {
+                        var values = [];
+                        for (let i=0; i<keys.length; i++) {
+                            values.push(parseInt(record_user[keys[i]]));
+                        };
+                        return values;
+                    };
+                    AviviD.addFan.model_X = AviviD.get_model_X(AviviD.record_user, AviviD.addFan.model_keys);
+                    AviviD.logistic_equation = function(X, coeff, intercept) {
+                        var Y = 0;
+                        for (let i=0; i<X.length; i++) {
+                            Y += coeff[i]*X[i];    
+                        };
+                        Y += intercept;
+                        var prob = 1/(1+Math.exp(-Y));
+                        return prob;
+                    };
+                    //// compute prob. of purchase
+                    AviviD.addFan.AviviD_prob_p = AviviD.logistic_equation(AviviD.addFan.model_X, AviviD.addFan.model_parameters, AviviD.addFan.model_intercept); 
+                    AviviD.addFan.AviviD_prob_p = Number((AviviD.addFan.AviviD_prob_p).toFixed(5));// round to .5f, Number((0.688689).toFixed(5))
+                    if (AviviD.addFan.AviviD_prob_p < AviviD.addFan.lower_bound){
+                        AviviD.fetch_addFan_ad_detials(AviviD.addFan.ad_id)
+                        .then((ad_details)=>{
+                            AviviD.addFan.ad_image_url = ad_details.ad_image_url; // image to display
+                            AviviD.addFan.ad_url = ad_details.ad_url; // url to redirect when click image
+                            AviviD.addFan.ad_btn_url = ad_details.ad_btn_url; // url to redirect when click button
+                            AviviD.addFan.ad_btn_text = ad_details.ad_btn_text; // button text to display
+                            AviviD.addFan.ad_btn_color = ad_details.ad_btn_color; // button color
+                        })
+                        .then(()=>{
+                            AviviD.onclick_redirect = function(url, mode=0) { // 0:clicking a link, 1:open new tab               
+                                (mode===0) ? window.location.href(url) : window.open(url, '_blank');
+                                jQuery(".avivid_addfan_page").hide(500);
+                            };
+                            AviviD.trigger_ad = function(url) { // 0:clicking a link, 1:open new tab       
+                                AviviD.LikrEventTrackingAcceptAd();
+                                window.open(url, '_blank');
+                                jQuery(".avivid_addfan_page").hide(500);
+                            };
+                            AviviD.trigger_af = function(url) { // 0:clicking a link, 1:open new tab       
+                                AviviD.LikrEventTrackingAcceptAf();
+                                window.open(url, '_blank');
+                                jQuery(".avivid_addfan_page").hide(500);
+                            };
+                            AviviD.close_addfan_page = function() {
+                                AviviD.LikrEventTrackingDiscardAfAd();
+                                jQuery(".avivid_addfan_page").remove();
+                            };
+                            AviviD.Promotion_ad = function() {
+                                let ad_css = 
+                                `
+                                <style>
+                                @media (orientation:portrait) {
+                                    .avivid_addfan_page {
+                                        width: 100%;
+                                        height: 100%;
+                                        position: fixed;
+                                        left: 0;
+                                        top: 0;
+                                        margin: auto;
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        background-color: rgba(0, 0, 0, .6);
+                                        z-index: 999;
+                                    }
+                                    .avivid_addfan_wrapper {
+                                        position: relative;
+                                        top: -15vw;
+                                        width: 75vw;
+                                        height: 100vw;
+                                    }
+                                    .avivid_addfan_close {
+                                        position: relative;
+                                        top: 13vw;
+                                        left: 65vw;
+                                        width: 9vw;
+                                        z-index: 1000;
+                                        cursor: pointer;
+                                    }
+            
+                                    .avivid_addfan_img_wrapper {
+                                        position: relative;
+                                        top: 0vw;
+                                        width: 75vw;
+                                        height: 100vw; 
+                                        border-width: 0;
+                                        padding: 0;
+                                    }
+                                    .avivid_addfan_img {
+                                        position: relative;
+                                        width: 100%;
+                                        height: 100%; 
+                                        object-fit: cover;
+                                        cursor: pointer;
+                                    }
+                                    .avivid_line_fans_btn {
+                                        position: relative;
+                                        top: -2vw;
+                                        width: 75vw;
+                                        height: 15vw;
+                                        background-color: `+AviviD.addFan.ad_btn_color+`;
+                                        cursor: pointer;
+
+                                    }
+                                    .avivid_logo {
+                                        position: relative;
+                                        top: 1vw;
+                                        left: 30vw;
+                                    }
+                                    .avivid_addfan_text {
+                                        position: relative;
+                                        top: 2vw;
+                                        font-size: 5vw;
+                                        font-weight: 700;
+                                        color: white;
+                                    }
+                                }
+            
+                                @media (orientation:landscape) {
+                                    .avivid_addfan_page {
+                                        min-width: 100%;
+                                        min-height: 100%;
+                                        position: fixed;
+                                        left: 0;
+                                        top: 0;
+                                        margin: auto;
+                                        display: flex;
+                                        background-color: rgba(0, 0, 0, .6);
+                                        z-index: 999;
+                                        overflow: auto;
+                                    }
+                                    .avivid_addfan_wrapper {
+                                        position: relative;
+                                        top: 10vw;
+                                        left: 20vw;
+                                        width: 75vw;
+                                        height: 10vw; 
+                                    }
+                                    .avivid_addfan_close {
+                                        position: relative;
+                                        top: -43vw;
+                                        left: 50vw;
+                                        width: 6vw;
+                                        z-index: 1000;
+                                        cursor: pointer;
+                                    }
+            
+                                    .avivid_addfan_img_wrapper {
+                                        position: relative;
+                                        top: 0vw;
+                                        width: 50vw;
+                                        height: 50vw; 
+                                        border-width: 0;
+                                        padding: 0;
+                                    }
+                                    .avivid_addfan_img {
+                                        position: relative;
+                                        left: 0vw;
+                                        width: 100%;
+                                        height: 100%; 
+                                        object-fit: cover;
+                                        cursor: pointer;
+                                    }
+                                    .avivid_line_fans_btn {
+                                        position: relative;
+                                        top: -2vw;
+                                        left: 6.5vw;
+                                        width: 50vw;
+                                        height: 10vw;
+                                        background-color: `+AviviD.addFan.ad_btn_color+`;
+                                        cursor: pointer;
+
+                                    }
+                                    .avivid_logo {
+                                        position: relative;
+                                        top: 1vw;
+                                        left: 21vw;
+                                    }
+                                    .avivid_addfan_text {
+                                        position: relative;
+                                        top: 2vw;
+                                        font-size: 4vw;
+                                        font-weight: 700;
+                                        color: white;
+                                    }
+                                }
+                                </style>
+                                `
+                                let ad_div = 
+                                `
+                                <div class="avivid_addfan_page" >
+                                    <div class="avivid_addfan_wrapper"> 
+                                        <img class="avivid_addfan_close" onclick="AviviD.close_addfan_page()" src="https://rhea-cache.advividnetwork.com/coupon/cancel.svg"></img>
+                                        <button class="avivid_addfan_img_wrapper" onclick="AviviD.trigger_ad('` + AviviD.addFan.ad_url + `', 1)">
+                                            <img class="avivid_addfan_img" src="` + AviviD.addFan.ad_image_url + `"></img>
+                                        </button>
+                                        <button class="avivid_line_fans_btn" onclick="AviviD.trigger_af('` + AviviD.addFan.ad_btn_url + `', 1)">
+                                            <p class="avivid_addfan_text">`+AviviD.addFan.ad_btn_text+`</p>
+                                            <img class="avivid_logo" src="https://rhea-cache.advividnetwork.com/coupon/AviviD_logo.svg"></img>
+                                        </button>
+                                    </div>
+                                </div>`
+                                $('body').prepend(ad_div);
+                                $('head').append(ad_css);
+                            };
+                            AviviD.Promotion_ad();
+                            // 1. save to cookies
+                            AviviD.addFan.AviviD_is_addfan_b = 1;
+                            AviviD.set_cookie_minutes_tracking("AviviD_is_addfan_b",AviviD.addFan.AviviD_is_addfan_b,60);
+                            AviviD.set_cookie_minutes_tracking("AviviD_prob_p",AviviD.addFan.AviviD_prob_p,60);
+                            // 2. send triggered addFan event
+                            AviviD.LikrEventTrackingSendAfAd();
+                        })
+                    };
+                });   
+            };    
+        });
+    };
+})
 
 //// A. call API to check coupon status, customer_type(0:all, 1:only new)
 //// B. if coupon status=1, do something, else, do nothing

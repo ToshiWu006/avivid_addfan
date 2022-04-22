@@ -22,6 +22,36 @@ AviviD.fetch_coupon_status = async function(web_id) {
     })
 };
 
+//// API to give the all coupons
+AviviD.fetch_coupon_status_all = async function(web_id) {
+    return new Promise((resolve, reject) => {
+        let url = 'https://rhea-cache.advividnetwork.com/api/coupon/status_all'; // https://rhea-cache.advividnetwork.com/api/
+        jQuery.ajax({
+            type: 'GET',
+            url: url,
+            cache: true,
+            dataType: 'json',
+            data: {
+                'web_id': web_id
+            },
+            success: function (result) {
+                // resolve(result)
+                result_modify = []
+                for (i=0;i<result.length;i++) {
+                    let coupon_limit = result[i]['coupon_limit'].split('limit-bill=')[1];
+                    result[i]['coupon_limit'] = coupon_limit===undefined ? 0 : parseInt(coupon_limit);
+                    result[i]['avg_budget'] = parseFloat(result[i]['avg_budget']);
+                    result_modify.push(result[i]);
+                }
+                resolve(result_modify)
+            },
+            fail: function (xhr, ajaxOptions, thrownError) {
+                reject(false)
+            },
+        })
+    })
+};
+
 //// API to give model for sending coupon
 AviviD.fetch_addFan_coupon_model = async function(web_id) {
     return new Promise((resolve, reject) => {
@@ -231,13 +261,34 @@ AviviD.LikrEventTrackingDiscardCoupon = function(){
 
 AviviD.addFan = typeof(AviviD.addFan) == 'undefined'? {} : AviviD.addFan;
 //// A. call API to check coupon status, customer_type(0:all, 1:only new)
-AviviD.fetch_coupon_status(AviviD.web_id)
-.then((data_status) => {
+AviviD.fetch_coupon_status_all(AviviD.web_id)
+.then((data_status_array) => {
     //// {"status":1, "coupon_id":10, "coupon_customer_type":0}
+    // data_status_array = await AviviD.fetch_coupon_status_all('rick');
+
+    if (data_status_array.length===1) {
+        data_status = data_status_array[0];
+        // AviviD.addFan.coupon_status = data_status.status; // 0: no available coupon, 1: yes
+        // AviviD.addFan.coupon_id = data_status.id; // use to get coupon information
+        // AviviD.addFan.coupon_customer_type = data_status.customer_type; // 0: all, 1: new only (exclude is_purchase_brfore=1)
+        // AviviD.addFan.website_type = data_status.website_type; // 0:normal, 1: one-page ecom
+    } else {
+        // data_status_array = await AviviD.fetch_coupon_status_all('rick');
+        // AviviD.addFan.coupon_status = true;
+        //// choose index of coupon
+        var index_coupon = 0;
+        var diff = -1;
+        for (i=0;i<data_status_array.length;i++) {
+            index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit'])<diff) ? i : index_coupon;
+            diff = Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit']);
+        }
+        data_status = data_status_array[index_coupon];
+    }
     AviviD.addFan.coupon_status = data_status.status; // 0: no available coupon, 1: yes
     AviviD.addFan.coupon_id = data_status.id; // use to get coupon information
     AviviD.addFan.coupon_customer_type = data_status.customer_type; // 0: all, 1: new only (exclude is_purchase_brfore=1)
     AviviD.addFan.website_type = data_status.website_type; // 0:normal, 1: one-page ecom
+    AviviD.addFan.coupon_limit = data_status.coupon_limit;
 
     AviviD.check_allow_coupon_by_customer_type = function() {
         let check_bool = (AviviD.addFan.coupon_customer_type==1 && AviviD.record_user.i_pb==1)? false : true;

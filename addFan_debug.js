@@ -1043,16 +1043,16 @@
                                 <img id = 'gif' src = 'https://rhea-cache.advividnetwork.com/coupon/animation_500.gif' style = 'width:60%'>
                             </div>
                             <div id = 'secondary_reciprocal' style = 'display:none'>
-                                <span countdown1 = '10' class="col-2" style = 'border-top-left-radius:500px;border-bottom-left-radius:500px;background-color: #FEA285;'></span>
-                                <span countdown1 = '9' class="col-2" style="background-color: #FDA682;"></span>
-                                <span countdown1 = '8' class="col-2" style="background-color: #FCAF7D;"></span>
-                                <span countdown1 = '7' class="col-2" style="background-color: #FBB877;"></span>
-                                <span countdown1 = '6' class="col-2" style="background-color: #FBB778;"></span>
-                                <span countdown1 = '5' class="col-2" style="background-color: #FABC74;"></span>
-                                <span countdown1 = '4' class="col-2" style="background-color: #F9C072;"></span>
-                                <span countdown1 = '3' class="col-2" style="background-color: #F9C56F;"></span>
-                                <span countdown1 = '2' class="col-2" style="background-color: #F9D26F;"></span>
-                                <span countdown1 = '1' class="col-2" style='border-top-right-radius:500px;border-bottom-right-radius:500px;background-color: #FFE37E;'></span>
+                                <span countdown1 = '10' class="col-2" style = 'border-top-left-radius:500px;border-bottom-left-radius:500px;background-color: #FEA285;padding-left: 0;flex: 0;'></span>
+                                <span countdown1 = '9' class="col-2" style="background-color: #FDA682;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '8' class="col-2" style="background-color: #FCAF7D;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '7' class="col-2" style="background-color: #FBB877;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '6' class="col-2" style="background-color: #FBB778;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '5' class="col-2" style="background-color: #FABC74;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '4' class="col-2" style="background-color: #F9C072;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '3' class="col-2" style="background-color: #F9C56F;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '2' class="col-2" style="background-color: #F9D26F;padding-left: 0;flex: 0;"></span>
+                                <span countdown1 = '1' class="col-2" style='border-top-right-radius:500px;border-bottom-right-radius:500px;background-color: #FFE37E;padding-left: 0;flex: 0;'></span>
                             </div>
                             <div id="count-down-price" style="text-align: center;padding: 6px;font-size:12px"></div>
                         </div>

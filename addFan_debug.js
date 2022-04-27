@@ -753,6 +753,9 @@
                             left: 32vw;
                             top: -3vw;
                         }
+                        .hidden{
+                            display: none;
+                        }
                     }
                     @media (orientation:landscape) {
                         .main_page{
@@ -978,6 +981,9 @@
                             left: 13.5vw;
                             top: -2vw;
                         }  
+                        .hidden{
+                            display: none;
+                        }
                     }
                 </style>`;
 

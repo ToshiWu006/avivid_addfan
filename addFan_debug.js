@@ -52,7 +52,7 @@
             AviviD.addCart.product_id = AviviD.parse_Cart_obj(obj, parser, 'product_id');
             AviviD.addCart.product_name = AviviD.parse_Cart_obj(obj, parser, 'product_name');
             AviviD.addCart.product_price = AviviD.parse_Cart_obj(obj, parser, 'product_price');
-            AviviD.addCart.product_quantity = AviviD.parse_Cart_obj(obj, parser, 'product_quantity');
+            AviviD.addCart.product_quantity = AviviD.parse_Cart_obj(obj, parser, 'product_quantity')===undefined ? 1 : AviviD.parse_Cart_obj(obj, parser, 'product_quantity');
             AviviD.addCart.total_price = parseInt(AviviD.addCart.product_price)*parseInt(AviviD.addCart.product_quantity);
             //// update total price in cookie
             AviviD.update_cart_price(AviviD.addCart.total_price);
@@ -497,7 +497,9 @@
                                 jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
                             };
                         };
-                    };
+                    } else { // no addCart events
+                        AviviD.addFan.limitReach = 1;
+                    }
                 }
                 //// load main for coupon
                 AviviD.Promotion_coupons = function(title, content, code, timeset, limit, mode=0){

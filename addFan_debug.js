@@ -1,4 +1,5 @@
 (async function(){
+    AviviD.web_id='rick';
     //// cart parser
     AviviD.fetch_cart_parser = async function() {
         return new Promise((resolve, reject) => {
@@ -499,6 +500,10 @@
                         };
                     } else { // no addCart events
                         AviviD.addFan.limitReach = 1;
+                    }
+                    if(AviviD.addFan.coupon_url != '_' && AviviD.addFan.coupon_url != undefined){//緊急針對有url設定但沒coupon code的修改 
+                        jQuery('.avivid_coupon_description').addClass('avivid_coupon_description_locked');
+                        $('.avivid_coupon, .avivid_coupon_code, .avivid_coupon_help').addClass('hidden');
                     }
                 }
                 //// load main for coupon

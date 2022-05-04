@@ -1776,12 +1776,14 @@
             let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
             let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
             let fb_id = AviviD.get_cookie_tracking('_fbp');
+            let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
             let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
             let tracking_data = {
                 'web_id'            : AviviD.web_id,
                 'uuid'              : uuid,
                 'ga_id'             : ga_id,
                 'fb_id'             : fb_id,
+                'ip'                : ip,
                 'timestamp'         : Date.now(),
                 "behavior_type"     : "likrTracking",
                 'event_type'        : "addCart",
@@ -1819,12 +1821,14 @@
             let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
             let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
             let fb_id = AviviD.get_cookie_tracking('_fbp');
+            let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
             let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
             let tracking_data = {
                 'web_id'            : AviviD.web_id,
                 'uuid'              : uuid,
                 'ga_id'             : ga_id,
                 'fb_id'             : fb_id,
+                'ip'                : ip,
                 'timestamp'         : Date.now(),
                 'event_type'        : "removeCart",
                 "coupon"            : is_coupon,

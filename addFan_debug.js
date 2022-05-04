@@ -57,13 +57,15 @@
             //// update total price in cookie
             AviviD.update_cart_price(AviviD.addCart.total_price);
             let cart_item = AviviD.get_cookie_tracking("AviviD_cart_product") == 'NaN' ? 'NaN' : AviviD.get_cookie_tracking("AviviD_cart_product");
-            if(cart_item == 'NaN'){
-                AviviD.set_cookie_minutes_tracking("AviviD_cart_product", AviviD.addCart.product_name, 60*24);
-            }else{
-                AviviD.set_cookie_minutes_tracking("AviviD_cart_product", cart_item +','+AviviD.addCart.product_name, 60*24);
-            }
-            
+            let cart_id = AviviD.get_cookie_tracking("AviviD_cart_id") == 'NaN' ? 'NaN' : AviviD.get_cookie_tracking("AviviD_cart_id");
 
+            if(cart_item == 'NaN'){
+                AviviD.set_cookie_minutes_tracking("AviviD_cart_id", AviviD.addCart.product_id, 60*24*7);
+                AviviD.set_cookie_minutes_tracking("AviviD_cart_product", AviviD.addCart.product_name, 60*24*7);
+            }else{
+                AviviD.set_cookie_minutes_tracking("AviviD_cart_id", cart_id +','+AviviD.addCart.product_id, 60*24*7);
+                AviviD.set_cookie_minutes_tracking("AviviD_cart_product", cart_item +','+AviviD.addCart.product_name, 60*24*7);
+            }           
         } else if (type==='removeCart') {
             var key = 'removeCart';
             var parser = AviviD.tracking_cart_parser[key];
@@ -77,7 +79,8 @@
             //// update total price in cookie
             AviviD.update_cart_price(-AviviD.removeCart.total_price);
         };
-        AviviD.update_couponUI();
+
+        // AviviD.update_couponUI();
     };
     AviviD.updated_cart_price = (AviviD.get_cookie_tracking('AviviD_cart_price')!=="NaN") ? parseInt(AviviD.get_cookie_tracking('AviviD_cart_price')) : 0;
     AviviD.tracking_cart_parser = await AviviD.fetch_cart_parser();
@@ -476,6 +479,7 @@
                         };
                     };    
                 };
+                //// 1.min reminding, 2.hide and modify coupon description
                 AviviD.update_couponUI = function(){
                     if (AviviD.tracking_addCart_parser['product_price']!==undefined) {
                         console.log('couponUI');
@@ -1798,6 +1802,8 @@
             AviviD.tracking_data_aws_put.construct(tracking_data);
             //// update addCart info
             AviviD.update_cart_info(AviviD.tracking_addToCart, 'addCart');
+            //// update coupon
+            AviviD.update_couponUI!==undefined ? AviviD.update_couponUI(): false;
         }
     }
 
@@ -1843,6 +1849,8 @@
             AviviD.tracking_data_aws_put.construct(tracking_data);
             //// update removeCart info
             AviviD.update_cart_info(AviviD.tracking_removeCart, 'removeCart');
+            //// update coupon
+            AviviD.update_couponUI!==undefined ? AviviD.update_couponUI(): false;
         }
     }
 

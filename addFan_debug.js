@@ -483,11 +483,13 @@
                     var coupon_css =
                     `<style>
                     @media (orientation:portrait) {
-                        .main_page{
+                        .avivid_main_page{
                             background-color: rgb(0, 0, 0,0.8);
                             min-width: 100%;
-                            min-height: 100%;
+                            height: 100vh;
+                            height: -webkit-fill-available;
                             position: fixed;
+                            top: 0;
                             bottom: 0;
                             z-index: 999;
                             overflow: auto;
@@ -600,20 +602,23 @@
                             background: url('https://rhea-cache.advividnetwork.com/coupon/Frame_40.png');
                             background-repeat: no-repeat;
                             width: 100vw;
-                            height: 70vw;
-                            background-size: 100%;
+                            height: 65vw;
+                            background-size: 90%;
+                            background-position: top center;
                         }
                         .avivid_coupon_content_wraper{
                             display: flex;
                             flex-direction: column;
                             align-items: center;
                             background: #fff;
-                            width: 89.7vw;
-                            margin-left: 0.6vw;
+                            width: 80.7vw;
+                            margin-left: 0.5vw;
                             padding: 0 5vw 20px 5vw;
                             border-radius: 0 0 30px 30px;
                             box-shadow: 0px 0px 10px 0px rgb(255 255 255 / 50%);
                             box-sizing: border-box;
+                            position: relative;
+                            top: -1px;
                         }
 
                         .avivid_coupon_title{             
@@ -723,7 +728,7 @@
                             margin: 1vh 0;
                         }
                         .avivid_coupon_discard{
-                            width: 32vw;
+                            width: 17vw;
                         }
                         .avivid_coupon_accept{
                             width: 44vw;
@@ -739,11 +744,13 @@
                         }
                     }
                     @media (orientation:landscape) {
-                        .main_page{
+                        .avivid_main_page{
                             background-color: rgb(0, 0, 0,0.8);
                             min-width: 100%;
-                            min-height: 100%;
+                            height: 100vh;
+                            height: -webkit-fill-available;
                             position: fixed;
+                            top: 0;
                             bottom: 0;
                             z-index: 999;
                             overflow: auto;
@@ -856,20 +863,23 @@
                             background: url('https://rhea-cache.advividnetwork.com/coupon/Frame_40.png');
                             background-repeat: no-repeat;
                             width: 100vw;
-                            height: 70vw;
-                            background-size: 100%;
+                            height: 65vw;
+                            background-size: 90%;
+                            background-position: top center;
                         }
                         .avivid_coupon_content_wraper{
                             display: flex;
                             flex-direction: column;
                             align-items: center;
                             background: #fff;
-                            width: 89.7vw;
-                            margin-left: 0.6vw;
+                            width: 80.65vw;
+                            margin-left: 0.3vw;
                             padding: 0 5vw 20px 5vw;
                             border-radius: 0 0 30px 30px;
                             box-shadow: 0px 0px 10px 0px rgb(255 255 255 / 50%);
                             box-sizing: border-box;
+                            position: relative;
+                            top: -1px;
                         }
                         .avivid_coupon_title{
 
@@ -956,7 +966,7 @@
                             margin: 1vh 0;
                         }
                         .avivid_coupon_discard{
-                            width: 19vw;
+                            width: 11vw;
                         }
                         .avivid_coupon_accept{
                             width: 26vw;
@@ -975,7 +985,7 @@
 
                     var main_div = 
                     `   
-                        <div class = 'main_page'>
+                        <div class = 'avivid_main_page'>
                             <div class = 'coupon_position'>
                                 <div class='avivid_coupon_cap'></div>
                                 <div class='avivid_coupon_content_wraper'>
@@ -988,9 +998,9 @@
                                     <div class='avivid_coupon_help'>請在購物車頁面「請輸入優惠碼」中輸入以上折扣代碼</div>
                                     <div class='avivid_coupon_sep'></div>
                                     <div class='avivid_coupon_alert'></div>     
-                                    <div class='avivid_coupon_btns' style = 'display: flex;'>
+                                    <div class='avivid_coupon_btns' style = 'display: flex;width: 100%;justify-content: space-around;'>
                                         <div id = 'avivid_coupon_discard_button' class='avivid_coupon_discard' onclick = 'AviviD.RemoveCoupon()'>                        
-                                            <img src = 'https://rhea-cache.advividnetwork.com/coupon/Frame_18.png' style = 'width: 55%;'>                            
+                                            <img src = 'https://rhea-cache.advividnetwork.com/coupon/Frame_18.png' style = 'width: 100%;'>                            
                                         </div>
                                         <div id = 'avivid_coupon_accept_button' class='avivid_coupon_accept' onclick = 'AviviD.AcceptCoupon()'>                        
                                             <img src = 'https://rhea-cache.advividnetwork.com/coupon/Frame_5.png' style = 'width: 100%;'>
@@ -1043,7 +1053,7 @@
                         AviviD.AcceptCoupon(false); // option to disable clickToClipboard        
                     } else { // 折價卷主視窗
                         //// first time to accept coupon, show main page, hide secondary page
-                        jQuery('.main_page').show();        
+                        jQuery('.avivid_main_page').show();        
                     };
                 };
 
@@ -1084,7 +1094,7 @@
                             // 1.clear counter
                             clearInterval(AviviD.addFan.countInterval);
                             // 2.remove counter UI
-                            jQuery('.main_page').remove();
+                            jQuery('.avivid_main_page').remove();
                             jQuery('#secondary_page').remove();
                             // 3.clear and reset cookies
                             AviviD.addFan.AviviD_is_coupon = 0;
@@ -1110,7 +1120,7 @@
                         AviviD.addFan.AviviD_is_coupon_b = 1;
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); // continue session
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
-                        jQuery('.main_page').hide();
+                        jQuery('.avivid_main_page').hide();
                     } else { // with time limit
                         //// initialize for AviviD.startCountDown()
                         AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? 60*AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r;
@@ -1131,10 +1141,10 @@
                         };
                         //// for timer=0 setting
                         if (AviviD.addFan.coupon_setTimer==0) {// no timer setting
-                            jQuery('.main_page').hide();                
+                            jQuery('.avivid_main_page').hide();                
                         } else { // show secondary page and timer
                             setTimeout(()=>{
-                                jQuery('.main_page').hide();
+                                jQuery('.avivid_main_page').hide();
                                 jQuery('#secondary_page').show();
                                 jQuery('#receive_button').attr('onclick', 'AviviD.show_secondary_page()');
                                 jQuery('#secondary_reciprocal').show(); 
@@ -1164,11 +1174,11 @@
                 };
 
                 AviviD.show_main_page = function(){
-                    jQuery('.main_page').show();
+                    jQuery('.avivid_main_page').show();
                     jQuery('#secondary_page').hide();
                 };
                 AviviD.show_secondary_page = function(){
-                    jQuery('.main_page').hide();
+                    jQuery('.avivid_main_page').hide();
                     jQuery('#secondary_page').show();
                     AviviD.sleep(1000).then(() => {
                         jQuery('#gif').show();
@@ -1201,7 +1211,7 @@
                     AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.01);
                     // 2.remove coupon
                     clearInterval(AviviD.addFan.countInterval);
-                    jQuery('.main_page').remove();
+                    jQuery('.avivid_main_page').remove();
                     jQuery('#secondary_page').remove();
                     // 3.send triggered discardCoupon event
                     AviviD.LikrEventTrackingDiscardCoupon();
@@ -1705,7 +1715,7 @@
             AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.01);
             // 2.remove coupon
             clearInterval(AviviD.addFan.countInterval);
-            jQuery('.main_page').remove();
+            jQuery('.avivid_main_page').remove();
             jQuery('#secondary_page').remove();
         };
         //// click coupon link

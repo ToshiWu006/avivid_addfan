@@ -600,16 +600,17 @@
                             background: url('https://rhea-cache.advividnetwork.com/coupon/Frame_40.png');
                             background-repeat: no-repeat;
                             width: 100vw;
-                            height: 70vw;
-                            background-size: 100%;
+                            height: 60vw;
+                            background-size: 90%;
+                            background-position: top center;
                         }
                         .avivid_coupon_content_wraper{
                             display: flex;
                             flex-direction: column;
                             align-items: center;
                             background: #fff;
-                            width: 89.7vw;
-                            margin-left: 0.6vw;
+                            width: 80.7vw;
+                            margin-left: 0.5vw;
                             padding: 0 5vw 20px 5vw;
                             border-radius: 0 0 30px 30px;
                             box-shadow: 0px 0px 10px 0px rgb(255 255 255 / 50%);
@@ -723,7 +724,7 @@
                             margin: 1vh 0;
                         }
                         .avivid_coupon_discard{
-                            width: 32vw;
+                            width: 17vw;
                         }
                         .avivid_coupon_accept{
                             width: 44vw;
@@ -856,16 +857,17 @@
                             background: url('https://rhea-cache.advividnetwork.com/coupon/Frame_40.png');
                             background-repeat: no-repeat;
                             width: 100vw;
-                            height: 70vw;
-                            background-size: 100%;
+                            height: 60vw;
+                            background-size: 90%;
+                            background-position: top center;
                         }
                         .avivid_coupon_content_wraper{
                             display: flex;
                             flex-direction: column;
                             align-items: center;
                             background: #fff;
-                            width: 89.7vw;
-                            margin-left: 0.6vw;
+                            width: 80.9vw;
+                            margin-left: 0.75vw;
                             padding: 0 5vw 20px 5vw;
                             border-radius: 0 0 30px 30px;
                             box-shadow: 0px 0px 10px 0px rgb(255 255 255 / 50%);
@@ -956,7 +958,7 @@
                             margin: 1vh 0;
                         }
                         .avivid_coupon_discard{
-                            width: 19vw;
+                            width: 16vw;
                         }
                         .avivid_coupon_accept{
                             width: 26vw;
@@ -988,9 +990,9 @@
                                     <div class='avivid_coupon_help'>請在購物車頁面「請輸入優惠碼」中輸入以上折扣代碼</div>
                                     <div class='avivid_coupon_sep'></div>
                                     <div class='avivid_coupon_alert'></div>     
-                                    <div class='avivid_coupon_btns' style = 'display: flex;'>
+                                    <div class='avivid_coupon_btns' style = 'display: flex;width: 100%;justify-content: space-around;'>
                                         <div id = 'avivid_coupon_discard_button' class='avivid_coupon_discard' onclick = 'AviviD.RemoveCoupon()'>                        
-                                            <img src = 'https://rhea-cache.advividnetwork.com/coupon/Frame_18.png' style = 'width: 55%;'>                            
+                                            <img src = 'https://rhea-cache.advividnetwork.com/coupon/Frame_18.png' style = 'width: 100%;'>                            
                                         </div>
                                         <div id = 'avivid_coupon_accept_button' class='avivid_coupon_accept' onclick = 'AviviD.AcceptCoupon()'>                        
                                             <img src = 'https://rhea-cache.advividnetwork.com/coupon/Frame_5.png' style = 'width: 100%;'>

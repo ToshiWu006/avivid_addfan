@@ -1121,7 +1121,7 @@
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); // continue session
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
                         jQuery('.avivid_main_page').hide();
-                    } else { // with time limit
+                    } else { // with time limit                        
                         //// initialize for AviviD.startCountDown()
                         AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? 60*AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r;
                         AviviD.addFan.AviviD_c_t_r_min = typeof(AviviD.addFan.AviviD_c_t_r_min)==='undefined' ? AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r_min;
@@ -1132,40 +1132,36 @@
                             // 1.send triggered acceptCoupon event
                             AviviD.LikrEventTrackingAcceptCoupon();
                         };
-                        //// copy coupon code to clipboard
-                        if (click_mode  && AviviD.addFan.limitReach == 1) {
-                            AviviD.ClickToClipboard(AviviD.addFan.coupon_code);
-                            if(AviviD.addFan.coupon_url != '_' && AviviD.addFan.coupon_url != undefined){//open new tab if coupon url is set
-                                window.open(AviviD.addFan.coupon_url, '_blank')
-                            };
-                        };
-                        //// for timer=0 setting
-                        if (AviviD.addFan.coupon_setTimer==0) {// no timer setting
-                            jQuery('.avivid_main_page').hide();                
-                        } else { // show secondary page and timer
-                            setTimeout(()=>{
-                                jQuery('.avivid_main_page').hide();
-                                jQuery('#secondary_page').show();
-                                jQuery('#receive_button').attr('onclick', 'AviviD.show_secondary_page()');
-                                jQuery('#secondary_reciprocal').show(); 
-                                // start counting   
-                                AviviD.startCountDown();    
-                                AviviD.sleep(4000).then(() => {
-                                    jQuery('#gif').hide();
-                                    AviviD.sleep(3000).then(() => {
-                                        jQuery('#gif').show();
-                                        AviviD.sleep(4000).then(() => {
-                                            jQuery('#gif').hide();
-                                            AviviD.sleep(3000).then(() => {
-                                                jQuery('#gif').show();
-                                                AviviD.sleep(4000).then(() => {
-                                                    jQuery('#gif').hide();                             
-                                                });
+                        // show secondary page and timer
+                        setTimeout(()=>{
+                            jQuery('.avivid_main_page').hide();
+                            jQuery('#secondary_page').show();
+                            jQuery('#receive_button').attr('onclick', 'AviviD.show_secondary_page()');
+                            jQuery('#secondary_reciprocal').show();
+                            // start counting   
+                            AviviD.startCountDown();    
+                            AviviD.sleep(4000).then(() => {
+                                jQuery('#gif').hide();
+                                AviviD.sleep(3000).then(() => {
+                                    jQuery('#gif').show();
+                                    AviviD.sleep(4000).then(() => {
+                                        jQuery('#gif').hide();
+                                        AviviD.sleep(3000).then(() => {
+                                            jQuery('#gif').show();
+                                            AviviD.sleep(4000).then(() => {
+                                                jQuery('#gif').hide();                             
                                             });
                                         });
                                     });
                                 });
-                            },800);
+                            });
+                        },800);
+                    };
+                    //// copy coupon code to clipboard
+                    if (click_mode  && AviviD.addFan.limitReach == 1) {
+                        AviviD.ClickToClipboard(AviviD.addFan.coupon_code);
+                        if(AviviD.addFan.coupon_url != '_' && AviviD.addFan.coupon_url != undefined){//open new tab if coupon url is set
+                            window.open(AviviD.addFan.coupon_url, '_blank');
                         };
                     };
                     // if(AviviD.addFan.coupon_url != '_' && AviviD.addFan.coupon_url != undefined){//open new tab if coupon url is set

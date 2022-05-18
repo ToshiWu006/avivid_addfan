@@ -1,4 +1,16 @@
 (async function(){
+    // window.history.pushState(null, null, "#");
+    // window.addEventListener("popstate", e=> {
+    //     alert('kidnap');
+    // });
+    
+    // AviviD.coupon_before_page = function(){
+    //     window.history.pushState(null, null, "#");
+    //     window.addEventListener("popstate", e=> {
+    //         alert('kidnap');
+    //     });
+    // }
+    // AviviD.coupon_before_page();
     //// allowed in index, category, product_page and exclude balcklist
     AviviD.check_addfan_rules_sub = function(mode=0) {
         // 0: check black rules, others: check allow rules
@@ -330,6 +342,17 @@
             AviviD.addFan.coupon_id = (AviviD.get_urlparam('coupon_id')) ? parseInt(AviviD.get_urlparam('coupon_id')) : AviviD.addFan.coupon_id;
             AviviD.addFan.coupon_customer_type = (AviviD.get_urlparam('coupon_customer_type')) ? parseInt(AviviD.get_urlparam('coupon_customer_type')) : AviviD.addFan.coupon_customer_type;
             AviviD.addFan.website_type = (AviviD.get_urlparam('website_type')) ? parseInt(AviviD.get_urlparam('website_type')) : AviviD.addFan.website_type;
+            if(AviviD.addFan.website_type == 1){
+                    var state = {state:'avivid_sec'};
+                    var next_state = {state:'avivid_third'};
+                    history.replaceState(state, "", window.location.href);
+                    window.history.pushState(next_state, "", window.location.href + "#");
+                    window.addEventListener("popstate", e=> {
+                        if(AviviD.get_cookie_tracking('AviviD_is_coupon_b') !== '1' ){
+                            AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, AviviD.addFan.coupon_limit, 0);
+                        }
+                    });
+            }
             AviviD.addFan.coupon_limit = (AviviD.get_urlparam('coupon_limit')) ? parseInt(AviviD.get_urlparam('coupon_limit')) : AviviD.addFan.coupon_limit;
         };
         //// C. check is_coupon cookies and customer_type

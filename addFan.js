@@ -48,7 +48,7 @@
         };
         //// check order, cart to block, match with pathname
         var pathname = location.pathname;
-        var block_regex = 'login|account|shopping|cart|pay|checkout|check|order|finish';
+        var block_regex = 'login|account|shopping|cart|pay|checkout|check|order|finish|bus';
         var res = pathname.search(new RegExp(block_regex, 'i')); // str or undefined
         if (res!==-1) {
             console.log('block this url');
@@ -480,6 +480,10 @@
                             jQuery('.avivid_coupon_description').addClass('avivid_coupon_description_locked');
                             jQuery('.avivid_coupon, .avivid_coupon_code').addClass('hidden');
                         }else{
+                            if (AviviD.addFan.limitReach==0) { // first time to accept
+                                // 1.send triggered acceptCoupon event
+                                AviviD.LikrEventTrackingAcceptCoupon();
+                            };
                             AviviD.addFan.limitReach = 1;// set customer
                             jQuery('#count-down-price').empty();
                             jQuery('.avivid_coupon_description').removeClass('avivid_coupon_description_locked');

@@ -1,16 +1,4 @@
 (async function(){
-    // window.history.pushState(null, null, "#");
-    // window.addEventListener("popstate", e=> {
-    //     alert('kidnap');
-    // });
-    
-    // AviviD.coupon_before_page = function(){
-    //     window.history.pushState(null, null, "#");
-    //     window.addEventListener("popstate", e=> {
-    //         alert('kidnap');
-    //     });
-    // }
-    // AviviD.coupon_before_page();
     //// allowed in index, category, product_page and exclude balcklist
     AviviD.check_addfan_rules_sub = function(mode=0) {
         // 0: check black rules, others: check allow rules
@@ -1128,7 +1116,7 @@
                             AviviD.addFan.AviviD_is_coupon_b = 1;
                             AviviD.addFan.AviviD_c_t_r = 0;
                             AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,0.01);
-                            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
+                            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,1*24*60);
                             AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.1);
                         };
                     }, 1000);    
@@ -1146,8 +1134,9 @@
                         AviviD.addFan.AviviD_is_coupon = 2;
                         AviviD.addFan.AviviD_is_coupon_b = 1;
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); // continue session
-                        AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
+                        AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,1*24*60);
                         jQuery('.avivid_main_page').hide();
+                        AviviD.LikrEventTrackingAcceptCoupon();
                     } else { // with time limit                        
                         //// initialize for AviviD.startCountDown()
                         AviviD.addFan.AviviD_c_t_r = typeof(AviviD.addFan.AviviD_c_t_r)==='undefined' ? 60*AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r;
@@ -1230,7 +1219,7 @@
                     AviviD.addFan.AviviD_is_coupon_b = 1;
                     AviviD.addFan.AviviD_c_t_r = 0;
                     AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,0.01);
-                    AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
+                    AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,1*24*60);
                     AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.01);
                     // 2.remove coupon
                     clearInterval(AviviD.addFan.countInterval);
@@ -1319,7 +1308,7 @@
             //// force to show coupon
             AviviD.addFan.AviviD_is_addfan_b = 0;
             AviviD.addFan.ad_status = true;
-            AviviD.addFan.ad_id = 76;
+            AviviD.addFan.ad_id = (AviviD.get_urlparam('ad_id')) ? parseInt(AviviD.get_urlparam('ad_id')) : AviviD.addFan.ad_id;
         } else {
             //// normal case
             AviviD.addFan.AviviD_is_addfan_b = ( AviviD.get_cookie_tracking('AviviD_is_addfan_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_addfan_b')) : 0;
@@ -1734,7 +1723,7 @@
             AviviD.addFan.AviviD_is_coupon_b = 1;
             AviviD.addFan.AviviD_c_t_r = 0;
             AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,0.01);
-            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,28*24*60);
+            AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,1*24*60);
             AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.01);
             // 2.remove coupon
             clearInterval(AviviD.addFan.countInterval);

@@ -1402,6 +1402,7 @@
                 let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
                 let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
                 let afad_info = {
+                    "l_b"   : AviviD.addFan.lower_bound,
                     "p_p"   : AviviD.addFan.AviviD_prob_p,
                     "a_i"   : AviviD.addFan.ad_id,
                     "w_t"   : AviviD.addFan.website_type,
@@ -1434,6 +1435,7 @@
                 let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
                 let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
                 let afad_info = {
+                    "l_b"   : AviviD.addFan.lower_bound,
                     "p_p"   : AviviD.addFan.AviviD_prob_p,
                     "a_i"   : AviviD.addFan.ad_id,
                     "w_t"   : AviviD.addFan.website_type,

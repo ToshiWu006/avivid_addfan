@@ -424,7 +424,7 @@
                             left: 15vw;
                             text-align: center;
                             display: none;
-                            z-index: 9999;
+                            z-index: 2147483642;
                         }
                     </style>`;
                     let coupon_copy_message_div = `<div class='avivid_copy_message'>`+coupon_copy_message+`</div>`;
@@ -506,7 +506,7 @@
                             position: fixed;
                             top: 0;
                             bottom: 0;
-                            z-index: 999;
+                            z-index: 2147483641;
                             overflow: auto;
                             display: none;
                         }
@@ -767,7 +767,7 @@
                             position: fixed;
                             top: 0;
                             bottom: 0;
-                            z-index: 999;
+                            z-index: 2147483641;
                             overflow: auto;
                         }
                         .coupon_position{

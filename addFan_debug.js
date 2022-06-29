@@ -295,12 +295,18 @@
     //// A. call API to check coupon status, customer_type(0:all, 1:only new)
     // var data_status_array = await AviviD.fetch_coupon_status_all('rick');
     var data_status_array = await AviviD.fetch_coupon_status_all(AviviD.web_id);
-    if (data_status_array.length===1) { // only one coupon
-        var data_status = data_status_array[0];
+    //// choose corresponding coupon using AviviD.record_user.i_pb
+    if (AviviD.record_user.i_pb===0) {
+        //// find customer_type===1
+        var data_status_array_filter = data_status_array.filter(x => x.customer_type===1);
+    } else if (AviviD.record_user.i_pb===1) {
+        //// find customer_type===2
+        var data_status_array_filter = data_status_array.filter(x => x.customer_type===2);
+    };
+    if (data_status_array_filter.length===0) {
+        var data_status = {status: false};
     } else {
-        // data_status_array = await AviviD.fetch_coupon_status_all('rick');
-        // AviviD.addFan.coupon_status = true;
-        //// choose index of coupon
+        //// choose index of coupon according to AviviD.updated_cart_price
         var index_coupon = 0;
         var diff = -1;
         for (i=0;i<data_status_array.length;i++) {
@@ -308,10 +314,37 @@
             diff = Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit']);
         }
         var data_status = data_status_array[index_coupon];
-    }
+    };
+
+    // if (data_status_array.length===1) { // only one coupon
+    //     var data_status = data_status_array[0];
+    // } else {
+    //     // data_status_array = await AviviD.fetch_coupon_status_all('rick');
+    //     // AviviD.addFan.coupon_status = true;
+    //     //// choose corresponding coupon using AviviD.record_user.i_pb
+    //     if (AviviD.record_user.i_pb===0) {
+    //         //// find customer_type===1
+    //         var data_status_array_filter = data_status_array.filter(x => x.customer_type===1);
+    //     } else if (AviviD.record_user.i_pb===1) {
+    //         //// find customer_type===2
+    //         var data_status_array_filter = data_status_array.filter(x => x.customer_type===2);
+    //     };
+    //     if (data_status_array_filter.length===0) {
+    //         var data_status = {coupon_status: false};
+    //     } else {
+    //         //// choose index of coupon according to AviviD.updated_cart_price
+    //         var index_coupon = 0;
+    //         var diff = -1;
+    //         for (i=0;i<data_status_array.length;i++) {
+    //             index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit'])<diff) ? i : index_coupon;
+    //             diff = Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit']);
+    //         }
+    //         var data_status = data_status_array[index_coupon];
+    //     };
+    // }
     AviviD.addFan.coupon_status = (AviviD.get_urlparam('avivid_preview_coupon')==1)? true : data_status.status; // false: no available coupon, true: yes or preview mode
     AviviD.addFan.coupon_id = data_status.id; // use to get coupon information
-    AviviD.addFan.coupon_customer_type = data_status.customer_type; // 0: all, 1: new only (exclude is_purchase_brfore=1)
+    AviviD.addFan.coupon_customer_type = data_status.customer_type; // 0: all, 1: new only (exclude is_purchase_brfore=1), 2: old only
     AviviD.addFan.website_type = data_status.website_type; // 0:normal, 1: one-page ecom
     AviviD.addFan.coupon_limit = data_status.coupon_limit;
     if (AviviD.get_urlparam('avivid_preview_coupon')==1) {
@@ -345,7 +378,8 @@
         };
         //// C. check is_coupon cookies and customer_type
         //// D. call model if is_purchase_before=0, AviviD_is_coupon_b=0, AviviD_is_coupon=0
-        if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0 && AviviD.record_user.i_pb!=1) {
+        // if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0 && AviviD.record_user.i_pb!=1) {
+        if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0) {
             //call API to fetch model parameters
             var data_model = await AviviD.fetch_addFan_coupon_model(AviviD.web_id, AviviD.addFan.coupon_id);
             AviviD.addFan.lower_bound = data_model.lower_bound;

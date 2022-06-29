@@ -475,15 +475,16 @@
                             AviviD.addFan.limitReach = 1;// set customer
                             jQuery('#count-down-price').empty();
                             jQuery('.avivid_coupon_description').removeClass('avivid_coupon_description_locked');
+                            jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
                             jQuery('.avivid_coupon, .avivid_coupon_code').removeClass('hidden');
-                            if(cart_product != 'NaN' && AviviD.addFan.coupon_customer_type == 2){//猶豫客
-                                if(cart_product.length > 25){
-                                    cart_product = cart_product.slice(0, 25) + '...';
-                                }
-                                jQuery('.avivid_coupon_description').text('此優惠券適用於: ' + cart_product);
-                            } else {
-                                jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
-                            };
+                            // if(cart_product != 'NaN' && AviviD.addFan.coupon_customer_type == 2){//猶豫客自動輸入優惠券內容(取消中)
+                            //     if(cart_product.length > 25){
+                            //         cart_product = cart_product.slice(0, 25) + '...';
+                            //     }
+                            //     jQuery('.avivid_coupon_description').text('此優惠券適用於: ' + cart_product);
+                            // } else {
+                            //     jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
+                            // };
                         };
                     } else { // no addCart events
                         AviviD.addFan.limitReach = 1;

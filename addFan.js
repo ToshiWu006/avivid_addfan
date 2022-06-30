@@ -309,11 +309,11 @@
         //// choose index of coupon according to AviviD.updated_cart_price
         var index_coupon = 0;
         var diff = -1;
-        for (i=0;i<data_status_array.length;i++) {
-            index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit'])<diff) ? i : index_coupon;
-            diff = Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit']);
+        for (i=0;i<data_status_array_filter.length;i++) {
+            index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array_filter[i]['coupon_limit'])<diff) ? i : index_coupon;
+            diff = Math.abs(AviviD.updated_cart_price - data_status_array_filter[i]['coupon_limit']);
         }
-        var data_status = data_status_array[index_coupon];
+        var data_status = data_status_array_filter[index_coupon];
     };
 
     AviviD.addFan.coupon_status = (AviviD.get_urlparam('avivid_preview_coupon')==1)? true : data_status.status; // false: no available coupon, true: yes or preview mode

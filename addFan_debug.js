@@ -309,39 +309,13 @@
         //// choose index of coupon according to AviviD.updated_cart_price
         var index_coupon = 0;
         var diff = -1;
-        for (i=0;i<data_status_array.length;i++) {
-            index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit'])<diff) ? i : index_coupon;
-            diff = Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit']);
+        for (i=0;i<data_status_array_filter.length;i++) {
+            index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array_filter[i]['coupon_limit'])<diff) ? i : index_coupon;
+            diff = Math.abs(AviviD.updated_cart_price - data_status_array_filter[i]['coupon_limit']);
         }
-        var data_status = data_status_array[index_coupon];
+        var data_status = data_status_array_filter[index_coupon];
     };
 
-    // if (data_status_array.length===1) { // only one coupon
-    //     var data_status = data_status_array[0];
-    // } else {
-    //     // data_status_array = await AviviD.fetch_coupon_status_all('rick');
-    //     // AviviD.addFan.coupon_status = true;
-    //     //// choose corresponding coupon using AviviD.record_user.i_pb
-    //     if (AviviD.record_user.i_pb===0) {
-    //         //// find customer_type===1
-    //         var data_status_array_filter = data_status_array.filter(x => x.customer_type===1);
-    //     } else if (AviviD.record_user.i_pb===1) {
-    //         //// find customer_type===2
-    //         var data_status_array_filter = data_status_array.filter(x => x.customer_type===2);
-    //     };
-    //     if (data_status_array_filter.length===0) {
-    //         var data_status = {coupon_status: false};
-    //     } else {
-    //         //// choose index of coupon according to AviviD.updated_cart_price
-    //         var index_coupon = 0;
-    //         var diff = -1;
-    //         for (i=0;i<data_status_array.length;i++) {
-    //             index_coupon = (Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit'])<diff) ? i : index_coupon;
-    //             diff = Math.abs(AviviD.updated_cart_price - data_status_array[i]['coupon_limit']);
-    //         }
-    //         var data_status = data_status_array[index_coupon];
-    //     };
-    // }
     AviviD.addFan.coupon_status = (AviviD.get_urlparam('avivid_preview_coupon')==1)? true : data_status.status; // false: no available coupon, true: yes or preview mode
     AviviD.addFan.coupon_id = data_status.id; // use to get coupon information
     AviviD.addFan.coupon_customer_type = data_status.customer_type; // 0: all, 1: new only (exclude is_purchase_brfore=1), 2: old only
@@ -509,15 +483,16 @@
                             AviviD.addFan.limitReach = 1;// set customer
                             jQuery('#count-down-price').empty();
                             jQuery('.avivid_coupon_description').removeClass('avivid_coupon_description_locked');
+                            jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
                             jQuery('.avivid_coupon, .avivid_coupon_code').removeClass('hidden');
-                            if(cart_product != 'NaN' && AviviD.addFan.coupon_customer_type == 2){//猶豫客
-                                if(cart_product.length > 25){
-                                    cart_product = cart_product.slice(0, 25) + '...';
-                                }
-                                jQuery('.avivid_coupon_description').text('此優惠券適用於: ' + cart_product);
-                            } else {
-                                jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
-                            };
+                            // if(cart_product != 'NaN' && AviviD.addFan.coupon_customer_type == 2){//猶豫客自動輸入優惠券內容(取消中)
+                            //     if(cart_product.length > 25){
+                            //         cart_product = cart_product.slice(0, 25) + '...';
+                            //     }
+                            //     jQuery('.avivid_coupon_description').text('此優惠券適用於: ' + cart_product);
+                            // } else {
+                            //     jQuery('.avivid_coupon_description').text(AviviD.addFan.coupon_description);
+                            // };
                         };
                     } else { // no addCart events
                         AviviD.addFan.limitReach = 1;

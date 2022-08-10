@@ -1,4 +1,183 @@
 (async function(){
+    AviviD = typeof(AviviD) == 'undefined'? {} : AviviD;
+
+    var AwsTrackingFunction=function(){
+        // @todo put tracking data endpoint to aws
+        data_stream_name = "elephant";
+        sdk_src = "https://avivid.likr.tw/sample/aws-sdk-min.js";
+        region_ = "ap-southeast-1";
+        identity_pool_id = "ap-southeast-1:f46698d9-24cf-4242-8a3d-8707f45d1cfd";
+        AviviD.tracking_data_aws_put = {
+            debug_mode: 0,
+            /** Based Setting START **/
+            sdkSrc: sdk_src,
+            region: region_, // 區域
+            IdentityPoolId: identity_pool_id, //Cognito Pool Id
+            dataStreamName: data_stream_name, // data stream名稱
+            kinesis: '',
+            credentialsStatus: false,
+            errorFlag: false,
+            errorMsg: '',
+            /** Based Setting END **/
+            /** Method START **/
+            /**
+             * @todo 檢查aws sdk有無載入並執行主程式
+             * @param {Object} tracking_data
+             */
+            construct: function (tracking_data) {
+                if (typeof (AviviD_AWS) == 'undefined') {
+                    //console.log('執行aws sdk載入');
+                    var script = document.createElement('script');
+                    script.src = this.sdkSrc;
+                    document.head.appendChild(script);
+                    script.onload = function () {
+                        //console.log('aws sdk載入完畢');
+                        AviviD.tracking_data_aws_put.main(tracking_data);
+                    };
+                } else {
+                    AviviD.tracking_data_aws_put.main(tracking_data);
+                }
+            },
+            /**
+             * @todo 主程式workflow
+             * @param {Object} tracking_data
+             */
+            main: function (tracking_data) {
+                /** CHECKING DEBUG MODE **/
+                if(window.location.href.indexOf('AviviD_debug_mode=1') != -1 || AviviD.category_id=='20200703000003'){
+                    this.debug_mode=1;
+                }
+                /** Step1 確認認證狀況 若沒有就執行認證 **/
+                if (!this.credentialsStatus) {
+                    //console.log('執行aws 認證');
+                    this.credentials_init();
+                }
+                /** Step2 確認kinesis初始化狀況 若無則執行初始化 **/
+                if (this.kinesis == '') {
+                    //console.log('執行aws kinesis初始化');
+                    this.kinesis = new AviviD_AWS.Kinesis();
+                }
+                /** Step3 執行資料處理 **/
+                //console.log('執行aws kinesis params處理');
+                data_prepared = this.prepare_data(tracking_data);
+                // if(this.debug_mode == 1){
+                //     console.log('The Data before putting in kinesis datastream:');
+                //     console.log(data_prepared);
+                // }
+                /** Step4 Put資料 **/
+                //console.log('執行aws kinesis params put');
+                this.kinesit_put_data(data_prepared);
+            },
+            /**
+             * @todo aws認證
+             */
+            credentials_init: function () {
+                AviviD_AWS.config.region = this.region; // 區域
+                ai = 'AKIATBR2IINU2ISIXU72';
+                sa = 'FDEVKX8o7qNAS15wWQGgjDXeLti2NC8xEuhM/y7d';
+                AviviD_AWS.config.credentials = new AviviD_AWS.Credentials(ai, sa, sessionToken = null);
+                AviviD_AWS.config.maxRetries = 5;
+                AviviD_AWS.config.credentials.get(function (err) {
+                    if (err) { //如果認證錯誤
+                        console.error(err);
+                        AviviD.tracking_data_aws_put.errorFlag = true;
+                        AviviD.tracking_data_aws_put.errorMsg = err;
+                        if(AviviD.tracking_data_aws_put.debug_mode==1){
+                            $.ajax({
+                                type:'POST',
+                                url:'https://likrbackupserver.likr.com.tw/gtm_seo_client/log/recordLog.php',
+                                dataType:'json',
+                                data:{
+                                    'value':JSON.stringify(AviviD.tracking_data_aws_put.errorMsg)+'認證失敗'
+                                }
+                            });
+                        }
+                        return;
+                    } else { //認證通過
+                        AviviD.tracking_data_aws_put.credentialsStatus = true;
+                        AviviD.tracking_data_aws_put.errorFlag = false;
+                        AviviD.tracking_data_aws_put.errorMsg = '';
+                        return;
+                    }
+                });
+            },
+            /**
+             * @todo put data to kinesis
+             * @param {Object} params
+             */
+            kinesit_put_data: function (params) {
+                this.kinesis.putRecord(params, function (err, data) {
+                    if (err) {
+                        AviviD.tracking_data_aws_put.errorFlag = true;
+                        AviviD.tracking_data_aws_put.errorMsg = err;
+                        if(AviviD.tracking_data_aws_put.debug_mode==1 && params.Data.indexOf('AviviD_test_20210111') != -1){
+                            $.ajax({
+                                type:'POST',
+                                url:'https://likrbackupserver.likr.com.tw/gtm_seo_client/log/recordLog.php',
+                                dataType:'json',
+                                data:{
+                                    'value':JSON.stringify(AviviD.tracking_data_aws_put.errorMsg)+'送資料失敗'
+                                }
+                            });
+                        }
+                        return;
+                    } else {
+                        AviviD.tracking_data_aws_put.errorFlag = false;
+                        AviviD.tracking_data_aws_put.errorMsg = '';
+                        if(AviviD.tracking_data_aws_put.debug_mode==1 && params.Data.indexOf('AviviD_test_20210111') != -1){
+                            $.ajax({
+                                type:'POST',
+                                url:'https://likrbackupserver.likr.com.tw/gtm_seo_client/log/recordLog.php',
+                                dataType:'json',
+                                data:{
+                                    'value':JSON.stringify(data)+'送資料成功'
+                                }
+                            });
+                        }
+                        return;
+                    }
+                });
+            },
+            /**
+             * @todo data formate/prepare
+             * @param {Object} tracking_data
+             */
+            prepare_data: function (tracking_data) {
+                return {
+                    Data: JSON.stringify(tracking_data),
+                    PartitionKey: this.uuid_generate(),
+                    StreamName: this.dataStreamName,
+                };
+            },
+            // prepare_data: function (tracking_data) {
+            //     return {
+            //         DeliveryStreamName: 'tapir_firehose',
+            //         Record: {
+            //             Data: JSON.stringify(tracking_data)
+            //         }
+            //     };
+            // },
+            /**
+             * @todo dataStream's uuid gen
+             * @param {Object} tracking_data
+             */
+            uuid_generate: function () {
+                var d = Date.now();
+                if (typeof performance !== 'undefined' && typeof performance.now == 'function') {
+                    d += performance.now(); //use high-precision timer if available
+                }
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = (d + Math.random() * 16) % 16 | 0;
+                    d = Math.floor(d / 16);
+                    return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+            }
+            /** Method END **/
+        }
+    }
+    AwsTrackingFunction()
+
+
     AviviD.get_cookie_tracking = function(cookie_name="AviviD_session_id") {
         let arr = document.cookie.match(new RegExp("(^| )" + cookie_name + "=([^;]*)(;|$)"));
         if (arr != null) {
@@ -47,80 +226,7 @@
         if (r != null) return unescape(r[2]);
         return null;
     }
-    // //// allowed in index, category, product_page and exclude balcklist
-    // AviviD.check_addfan_rules_sub = function(mode=0) {
-    //     // 0: check black rules, others: check allow rules
-    //     var href = location.href.split('avivid')[0].slice(0); // remove avivid related search query
-    //     href = href.slice(-1)==='?' || href.slice(-1)==='&' ? href.slice(0,-1) : href;
-    //     var url_key = (mode==0) ? ['login', 'cart', 'checkout'] : ['index', 'category', 'product'];
-    //     var obj = (mode==0) ? AviviD.blacklist['blacklist_rules'] : AviviD.block_setting;
-    //     var status = (mode==0) ? false : true;
-    //     var enable = (mode==0) ? AviviD.blacklist['blacklist_rules']['blacklist_switch']==1 : true;
-    //     if (enable) {
-    //         for (let i = 0; i < url_key.length; i++) {
-    //             let event_key = obj[url_key[i]];
-    //             let force_domain = (event_key!==undefined) ? event_key['force_domain'] : false;
-    //             if (force_domain==1) {
-    //                 //// check domain_list (fully match)
-    //                 let domain_list = event_key['domain_list'];
-    //                 if (domain_list.includes(href)) {
-    //                     return status; // early return
-    //                 };
-    //             } else if (force_domain==0) {
-    //                 //// check blacklist rule (partially match)
-    //                 let check_rule = event_key['check_rule']; // str
-    //                 if (href.toLowerCase().includes(check_rule.toLowerCase())) {
-    //                     return status; // early return
-    //                 };
-    //             };
-    //         };
-    //     };
-    // };
-    // AviviD.check_addfan_rules = function() {
-    //     //// check black_list first
-    //     var c0 = AviviD.check_addfan_rules_sub(0);
-    //     if (c0!==undefined) {
-    //         return c0; // early return false
-    //     };
-    //     //// check order, cart to block, match with pathname
-    //     var pathname = location.pathname;
-    //     var block_regex = 'login|account|shopping|cart|pay|checkout|check|order|finish|bus';
-    //     var res = pathname.search(new RegExp(block_regex, 'i')); // str or undefined
-    //     if (res!==-1) {
-    //         console.log('block this url');
-    //         return false;
-    //     };
-    //     //// check allowed rules
-    //     var c1 = AviviD.check_addfan_rules_sub(1);
-    //     if (c1!==undefined) {
-    //         return c1;
-    //     };
-    //     return false;
-    // };
-    // // AviviD.check_addfan_rules();
-    // //// should be loaded after event_tracker_gtm.js
-    // //// Rules in https://docs.google.com/document/d/1YFZf0DYqI1XHuRM8teZx5wy_fcAoWfPplVJjUXGb--U/edit?usp=sharing
-    // //// API to give the highest prioity coupon
-    // AviviD.fetch_coupon_status = async function(web_id) {
-    //     return new Promise((resolve, reject) => {
-    //         let url = 'https://rhea-cache.advividnetwork.com/api/coupon/status'; // https://rhea-cache.advividnetwork.com/api/
-    //         jQuery.ajax({
-    //             type: 'GET',
-    //             url: url,
-    //             cache: true,
-    //             dataType: 'json',
-    //             data: {
-    //                 'web_id': web_id
-    //             },
-    //             success: function (result) {
-    //                 resolve(result)
-    //             },
-    //             fail: function (xhr, ajaxOptions, thrownError) {
-    //                 reject(false)
-    //             },
-    //         })
-    //     })
-    // };
+ 
 
     //// API to give the all coupons
     AviviD.fetch_coupon_status_all = async function(web_id) {
@@ -152,28 +258,6 @@
         })
     };
 
-    // //// API to give model for sending coupon
-    // AviviD.fetch_addFan_coupon_model = async function(web_id, coupon_id) {
-    //     return new Promise((resolve, reject) => {
-    //         let url = 'https://rhea-cache.advividnetwork.com/api/coupon/model'; // https://rhea-cache.advividnetwork.com/api/
-    //         jQuery.ajax({
-    //             type: 'GET',
-    //             url: url,
-    //             cache: true,
-    //             dataType: 'json',
-    //             data: {
-    //                 'web_id': web_id,
-    //                 'coupon_id': coupon_id
-    //             },
-    //             success: function (result) {
-    //                 resolve(result)
-    //             },
-    //             fail: function (xhr, ajaxOptions, thrownError) {
-    //                 reject(false)
-    //             },
-    //         })
-    //     })
-    // };
 
     //// API to give coupon details (use coupon id)
     AviviD.fetch_addFan_coupon_detials = async function(coupon_id) {
@@ -218,45 +302,6 @@
             });
         });
     };
-
-    // AviviD.LikrEventTrackingSendCoupon = function(){
-    //     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
-    //     let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
-    //     let fb_id = AviviD.get_cookie_tracking('_fbp');
-    //     let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
-    //     let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
-    //     let coupon_info = {
-    //         "p_p"   : AviviD.addFan.AviviD_prob_p,
-    //         "l_b"   : AviviD.addFan.lower_bound,
-    //         "u_b"   : AviviD.addFan.upper_bound,
-    //         "m_k"   : AviviD.addFan.model_keys,
-    //         "m_p"   : AviviD.addFan.model_parameters,
-    //         "m_i"   : AviviD.addFan.model_intercept,
-    //         "m_X"   : AviviD.addFan.model_X,
-    //         "c_i"   : AviviD.addFan.coupon_id,
-    //         "c_c_t" : AviviD.addFan.coupon_customer_type,
-    //         "w_t"   : AviviD.addFan.website_type,
-
-    //     };
-    //     let tracking_data = {
-    //         'web_id'            : AviviD.web_id,
-    //         'uuid'              : uuid,
-    //         'ga_id'             : ga_id,
-    //         'fb_id'             : fb_id,
-    //         'ip'                : ip,
-    //         'timestamp'         : Date.now(),
-    //         "behavior_type"     : "likrTracking",
-    //         'event_type'        : "sendCoupon",
-    //         "coupon"            : is_coupon,
-    //         'record_user'       : AviviD.record_user,
-    //         "coupon_info"       : coupon_info,
-    //     };
-    //     //// don't send if in preview mode
-    //     if (AviviD.get_urlparam('avivid_preview_coupon')!=1) {
-    //         AviviD.tracking_data_aws_put.construct(tracking_data);
-    //         console.log("trigger sendCoupon event");
-    //     };
-    // };
 
     // AviviD.LikrEventTrackingAcceptCoupon = function(){
     //     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
@@ -340,8 +385,9 @@
 
     AviviD.addFan = typeof(AviviD.addFan) == 'undefined'? {} : AviviD.addFan;
     //// A. call API to check coupon status, customer_type(0:all, 1:only new)
-    var data_status_array = await AviviD.fetch_coupon_status_all('rick');
-    // var data_status_array = await AviviD.fetch_coupon_status_all(AviviD.web_id);
+    // var data_status_array = await AviviD.fetch_coupon_status_all('rick');
+    var data_status_array = await AviviD.fetch_coupon_status_all(AviviD.web_id);
+    // 1(new),2(old),3(exit),4,5
     var data_status_array_filter = data_status_array.filter(x => x.customer_type===3);
 
     if (data_status_array_filter.length===0) {
@@ -357,6 +403,8 @@
     AviviD.addFan.coupon_customer_type = data_status.customer_type; // 0: all, 1: new only (exclude is_purchase_brfore=1), 2: old only
     AviviD.addFan.website_type = data_status.website_type; // 0:normal, 1: one-page ecom
     AviviD.addFan.coupon_limit = data_status.coupon_limit;
+    AviviD.addFan.coupon_setTimer = data_status.coupon_time_limit; // 0: no timer, no secondary page
+
     if (AviviD.get_urlparam('avivid_preview_coupon')==1) {
         AviviD.addFan.coupon_status = true;
     }
@@ -364,7 +412,6 @@
     if (AviviD.addFan.coupon_status) { // coupon enable
         AviviD.addFan.AviviD_is_coupon_b = ( AviviD.get_cookie_tracking('AviviD_is_coupon_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_coupon_b')) : 0;
         AviviD.addFan.AviviD_is_coupon = ( AviviD.addFan.AviviD_is_coupon_b==0 ) ? 1 : 0;
-        AviviD.addFan.AviviD_prob_p = ( AviviD.get_cookie_tracking('AviviD_prob_p')!=="NaN" ) ? parseFloat(AviviD.get_cookie_tracking('AviviD_prob_p')) : 0;
         if (AviviD.get_urlparam('avivid_preview_coupon')==1) {
             //// force to show coupon
             AviviD.addFan.AviviD_is_coupon = 1;
@@ -375,55 +422,9 @@
             AviviD.addFan.website_type = (AviviD.get_urlparam('website_type')) ? parseInt(AviviD.get_urlparam('website_type')) : AviviD.addFan.website_type;
             AviviD.addFan.coupon_limit = (AviviD.get_urlparam('coupon_limit')) ? parseInt(AviviD.get_urlparam('coupon_limit')) : AviviD.addFan.coupon_limit;
         };
-        //// C. check is_coupon cookies and customer_type
-        //// D. call model if is_purchase_before=0, AviviD_is_coupon_b=0, AviviD_is_coupon=0
-        // if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0 && AviviD.record_user.i_pb!=1) {
-        if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==0) {
-            console.log("do nothing")
-            // //call API to fetch model parameters
-            // var data_model = await AviviD.fetch_addFan_coupon_model(AviviD.web_id, AviviD.addFan.coupon_id);
-            // AviviD.addFan.lower_bound = data_model.lower_bound;
-            // AviviD.addFan.upper_bound = data_model.upper_bound;
-            // AviviD.addFan.model_keys = data_model.model_key_js.split(',');
-            // AviviD.addFan.model_parameters = data_model.model_value.split(',').map(x => parseFloat(x));
-            // AviviD.addFan.model_intercept = data_model.model_intercept;
-            // ////E. compute probability of purchase
-            // AviviD.get_model_X = function(record_user, keys) {
-            //     var values = [];
-            //     for (let i=0; i<keys.length; i++) {
-            //         values.push(parseInt(record_user[keys[i]]));
-            //     };
-            //     return values;
-            // };
-            // AviviD.logistic_equation = function(X, coeff, intercept) {
-            //     var Y = 0;
-            //     for (let i=0; i<X.length; i++) {
-            //         Y += coeff[i]*X[i];    
-            //     };
-            //     Y += intercept;
-            //     var prob = 1/(1+Math.exp(-Y));
-            //     return prob;
-            // };
-            // //// compute prob. of purchase
-            // AviviD.addFan.model_X = AviviD.get_model_X(AviviD.record_user, AviviD.addFan.model_keys);
-            // AviviD.addFan.AviviD_prob_p = AviviD.logistic_equation(AviviD.addFan.model_X, AviviD.addFan.model_parameters, AviviD.addFan.model_intercept); 
-            // AviviD.addFan.AviviD_prob_p = Number((AviviD.addFan.AviviD_prob_p).toFixed(5));// round to .5f, Number((0.688689).toFixed(5))
-            // //// check if send coupon next page
-            // if (AviviD.addFan.AviviD_prob_p >= AviviD.addFan.lower_bound && AviviD.addFan.AviviD_prob_p <= AviviD.addFan.upper_bound){
-            //     //// yes to send. Going to next page within 60 min will send coupon next page successfully
-            //     // 1. save to cookies
-            //     AviviD.addFan.AviviD_is_coupon = 1;
-            //     AviviD.addFan.AviviD_is_coupon_b = 1;
-            //     AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,60);
-            //     AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,60);
-            //     AviviD.set_cookie_minutes_tracking("AviviD_prob_p",AviviD.addFan.AviviD_prob_p,60);
-            //     // 2. send triggered sendCoupon event
-            //     AviviD.LikrEventTrackingSendCoupon();
-            // } else {
-            //     //// do nothing
-            // };
+
         //// F. get coupon details(API)
-        } else if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==1) { // show coupon both 1 (do not show when AviviD_is_coupon==2)
+        if (AviviD.addFan.AviviD_is_coupon_b==0 && AviviD.addFan.AviviD_is_coupon==1) { // show coupon both 1 (do not show when AviviD_is_coupon==2)
             // 1.call API to fetch coupon information, key: web_id, coupon_enable=1, coupon_delete=0, today>=start_time and today<=end_time
             var coupon_details = await AviviD.fetch_addFan_coupon_detials(AviviD.addFan.coupon_id);
             AviviD.addFan.coupon_title = coupon_details.title;
@@ -1127,6 +1128,7 @@
                     if (AviviD.addFan.coupon_setTimer==0) { // without time limit setting
                         AviviD.addFan.AviviD_is_coupon = 2;
                         AviviD.addFan.AviviD_is_coupon_b = 1;
+                        AviviD.addFan.coupon_accept = 1;
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,30); // continue session
                         AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,1*24*60);
                         jQuery('.avivid_main_page').hide();
@@ -1212,6 +1214,7 @@
                     AviviD.addFan.AviviD_is_coupon = 0;
                     AviviD.addFan.AviviD_is_coupon_b = 1;
                     AviviD.addFan.AviviD_c_t_r = 0;
+                    AviviD.addFan.coupon_discard = 1;
                     AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",AviviD.addFan.AviviD_is_coupon,0.01);
                     AviviD.set_cookie_minutes_tracking("AviviD_is_coupon_b",AviviD.addFan.AviviD_is_coupon_b,1*24*60);
                     AviviD.set_cookie_minutes_tracking("AviviD_c_t_r",AviviD.addFan.AviviD_c_t_r,0.01);
@@ -1282,21 +1285,49 @@
             });
         });
     };
-
+    AviviD.fetch_ad_status_all = async function(web_id) {
+        return new Promise((resolve, reject) => {
+            let url = 'https://rhea-cache.advividnetwork.com/api/coupon/ad_status_all'; // https://rhea-cache.advividnetwork.com/api/
+            jQuery.ajax({
+                type: 'GET',
+                url: url,
+                cache: true,
+                dataType: 'json',
+                data: {
+                    'web_id': web_id
+                },
+                success: function (result) {
+                    resolve(result)
+                },
+                fail: function (xhr, ajaxOptions, thrownError) {
+                    reject(false)
+                },
+            });
+        });
+    };
     AviviD.check_allow_addfan = function() {
         if (AviviD.get_urlparam('avivid_preview_afad')==1) {
             //// force to show addfan
             return true;
         } else {
-            return AviviD.addFan.AviviD_is_coupon===0;
+            AviviD.addFan.AviviD_is_addfan_b = ( AviviD.get_cookie_tracking('AviviD_is_addfan_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_addfan_b')) : 0;
+            return AviviD.addFan.AviviD_is_addfan_b===0;
         };
     };
 
     //// 1. check available ad, if not sending coupon
     //// coupon and addfan can only choose one
     if (AviviD.check_allow_addfan()) {
-        var ad_status = await AviviD.fetch_ad_status('rick');
-        // var ad_status = await AviviD.fetch_ad_status(AviviD.web_id);
+        // var ad_status_array = await AviviD.fetch_ad_status_all('rick');
+        var ad_status_array = await AviviD.fetch_ad_status_all(AviviD.web_id);
+        var ad_status_array_filter = ad_status_array.filter(x => x.customer_type===3);
+        if (ad_status_array_filter.length===0) {
+            var ad_status = {status: false};
+        } else {
+            //// choose index of coupon according to AviviD.updated_cart_price
+            var ad_status = ad_status_array_filter[0];
+        };
+
         AviviD.addFan.ad_status = ad_status.status; // 0: no available ad, 1: yes
         AviviD.addFan.ad_id = ad_status.id; // use to get ad information
         AviviD.addFan.website_type = ad_status.website_type; // 0:normal, 1: one-page ecom
@@ -1311,28 +1342,7 @@
         };
         //// 2. call addfan_ad if ad_status=1, AviviD_is_addfan_b=0
         if (AviviD.addFan.ad_status && AviviD.addFan.AviviD_is_addfan_b==0) {
-            //// API to give model for sending afad
-            AviviD.fetch_addFan_ad_model = async function(web_id, coupon_id) {
-                return new Promise((resolve, reject) => {
-                    let url = 'https://rhea-cache.advividnetwork.com/api/coupon/model2'; // https://rhea-cache.advividnetwork.com/api/
-                    jQuery.ajax({
-                        type: 'GET',
-                        url: url,
-                        cache: true,
-                        dataType: 'json',
-                        data: {
-                            'web_id': web_id,
-                            'coupon_id': coupon_id
-                        },
-                        success: function (result) {
-                            resolve(result)
-                        },
-                        fail: function (xhr, ajaxOptions, thrownError) {
-                            reject(false)
-                        },
-                    })
-                })
-            };
+
             //// API to give ad details (use ad id)
             AviviD.fetch_addFan_ad_detials = async function(ad_id) {
                 return new Promise((resolve, reject) => {
@@ -1424,69 +1434,63 @@
             //     };
             // };
         
-            // AviviD.LikrEventTrackingAcceptAf = function(){
-            //     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
-            //     let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
-            //     let fb_id = AviviD.get_cookie_tracking('_fbp');
-            //     let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
-            //     let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
-            //     let afad_info = {
-            //         "l_b"   : AviviD.addFan.lower_bound,
-            //         "p_p"   : AviviD.addFan.AviviD_prob_p,
-            //         "a_i"   : AviviD.addFan.ad_id,
-            //         "w_t"   : AviviD.addFan.website_type,
+            AviviD.LikrEventTrackingAcceptAf = function(){
+                let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+                let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
+                let afad_info = {
+                    "l_b"   : 0,
+                    "p_p"   : 0,
+                    "a_i"   : AviviD.addFan.ad_id,
+                    "w_t"   : AviviD.addFan.website_type,
         
-            //     };
-            //     let tracking_data = {
-            //         'web_id'            : AviviD.web_id,
-            //         'uuid'              : uuid,
-            //         'ga_id'             : ga_id,
-            //         'fb_id'             : fb_id,
-            //         'ip'                : ip,
-            //         'timestamp'         : Date.now(),
-            //         "behavior_type"     : "likrTracking",
-            //         'event_type'        : "acceptAf",
-            //         "coupon"            : is_coupon,
-            //         'record_user'       : AviviD.record_user,
-            //         "afad_info"         : afad_info,
-            //     };
-            //     //// don't send if in preview mode
-            //     if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
-            //         AviviD.tracking_data_aws_put.construct(tracking_data);
-            //         console.log("trigger acceptAf event");
-            //     };
-            // };
+                };
+                let tracking_data = {
+                    'web_id'            : AviviD.web_id,
+                    'uuid'              : uuid,
+                    'ga_id'             : '_',
+                    'fb_id'             : '_',
+                    'ip'                : '_',
+                    'timestamp'         : Date.now(),
+                    "behavior_type"     : "likrTracking",
+                    'event_type'        : "acceptAf",
+                    "coupon"            : is_coupon,
+                    'record_user'       : AviviD.record_user,
+                    "afad_info"         : afad_info,
+                };
+                //// don't send if in preview mode
+                if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
+                    AviviD.tracking_data_aws_put.construct(tracking_data);
+                    console.log("trigger acceptAf event");
+                };
+            };
         
-            // AviviD.LikrEventTrackingDiscardAfAd = function(){
-            //     let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
-            //     let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
-            //     let fb_id = AviviD.get_cookie_tracking('_fbp');
-            //     let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
-            //     let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
-            //     let afad_info = {
-            //         "p_p"   : AviviD.addFan.AviviD_prob_p,
-            //         "a_i"   : AviviD.addFan.ad_id,
-            //         "w_t"   : AviviD.addFan.website_type,
-            //     };
-            //     let tracking_data = {
-            //         'web_id'            : AviviD.web_id,
-            //         'uuid'              : uuid,
-            //         'ga_id'             : ga_id,
-            //         'fb_id'             : fb_id,
-            //         'ip'                : ip,
-            //         'timestamp'         : Date.now(),
-            //         "behavior_type"     : "likrTracking",
-            //         'event_type'        : "discardAfAd",
-            //         "coupon"            : is_coupon,
-            //         'record_user'       : AviviD.record_user,
-            //         "afad_info"         : afad_info,
-            //     };
-            //     //// don't send if in preview mode
-            //     if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
-            //         AviviD.tracking_data_aws_put.construct(tracking_data);
-            //         console.log("trigger discardAfAd event");
-            //     };
-            // };
+            AviviD.LikrEventTrackingDiscardAfAd = function(){
+                let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+                let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
+                let afad_info = {
+                    "p_p"   : 0,
+                    "a_i"   : AviviD.addFan.ad_id,
+                    "w_t"   : AviviD.addFan.website_type,
+                };
+                let tracking_data = {
+                    'web_id'            : AviviD.web_id,
+                    'uuid'              : uuid,
+                    'ga_id'             : '_',
+                    'fb_id'             : '_',
+                    'ip'                : '_',
+                    'timestamp'         : Date.now(),
+                    "behavior_type"     : "likrTracking",
+                    'event_type'        : "discardAfAd",
+                    "coupon"            : is_coupon,
+                    'record_user'       : AviviD.record_user,
+                    "afad_info"         : afad_info,
+                };
+                //// don't send if in preview mode
+                if (AviviD.get_urlparam('avivid_preview_afad')!=1) {
+                    AviviD.tracking_data_aws_put.construct(tracking_data);
+                    console.log("trigger discardAfAd event");
+                };
+            };
             var ad_details = await AviviD.fetch_addFan_ad_detials(AviviD.addFan.ad_id);
             AviviD.addFan.ad_image_url = ad_details.ad_image_url; // image to display
             AviviD.addFan.ad_url = ad_details.ad_url; // url to redirect when click image
@@ -1503,12 +1507,13 @@
                 jQuery(".avivid_addfan_page").hide(500);
             };
             AviviD.trigger_af = function(url) { // 0:clicking a link, 1:open new tab       
-                // AviviD.LikrEventTrackingAcceptAf();
+                AviviD.LikrEventTrackingAcceptAf();
+                AviviD.addFan.af_accept = 1;
                 window.open(url, '_blank');
                 jQuery(".avivid_addfan_page").hide(500);
             };
             AviviD.close_addfan_page = function() {
-                // AviviD.LikrEventTrackingDiscardAfAd();
+                AviviD.LikrEventTrackingDiscardAfAd();
                 jQuery(".avivid_addfan_page").remove();
             };
             AviviD.Promotion_ad = function() {
@@ -1673,7 +1678,7 @@
             // 1. save to cookies
             AviviD.addFan.AviviD_is_addfan_b = 1;
             AviviD.set_cookie_minutes_tracking("AviviD_is_addfan_b",AviviD.addFan.AviviD_is_addfan_b,60);
-            AviviD.set_cookie_minutes_tracking("AviviD_prob_p",AviviD.addFan.AviviD_prob_p,60);
+            // AviviD.set_cookie_minutes_tracking("AviviD_prob_p",AviviD.addFan.AviviD_prob_p,60);
             // 2. send triggered addFan event
             // AviviD.LikrEventTrackingSendAfAd();
         };

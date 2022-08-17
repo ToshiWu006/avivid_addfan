@@ -387,8 +387,8 @@
     //// A. call API to check coupon status, customer_type(0:all, 1:only new)
     // var data_status_array = await AviviD.fetch_coupon_status_all('rick');
     var data_status_array = await AviviD.fetch_coupon_status_all(AviviD.web_id);
-    // 1(new),2(old),3(exit),4,5
-    var data_status_array_filter = data_status_array.filter(x => x.customer_type===3);
+    // 1(new),2(old),99(exit),4,5
+    var data_status_array_filter = data_status_array.filter(x => x.customer_type===99);
 
     if (data_status_array_filter.length===0) {
         var data_status = {status: false};
@@ -1320,7 +1320,7 @@
     if (AviviD.check_allow_addfan()) {
         // var ad_status_array = await AviviD.fetch_ad_status_all('rick');
         var ad_status_array = await AviviD.fetch_ad_status_all(AviviD.web_id);
-        var ad_status_array_filter = ad_status_array.filter(x => x.customer_type===3);
+        var ad_status_array_filter = ad_status_array.filter(x => x.customer_type===99);
         if (ad_status_array_filter.length===0) {
             var ad_status = {status: false};
         } else {

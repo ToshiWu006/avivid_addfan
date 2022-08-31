@@ -305,7 +305,7 @@
 
     AviviD.LikrEventTrackingAcceptCoupon = function(){
         let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
-        let uuid = AviviD.web_uuid === undefined ? AviviD.get_cookie_tracking('AviviD_uuid') : AviviD.web_uuid;
+        let uuid = (AviviD.web_uuid === undefined || AviviD.web_uuid === "_") ? AviviD.get_cookie_tracking('AviviD_uuid') : AviviD.web_uuid;
         let fb_id = AviviD.get_cookie_tracking('_fbp');
         let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
         let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;
@@ -345,7 +345,7 @@
 
     AviviD.LikrEventTrackingDiscardCoupon = function(){
         let ga_id = ( AviviD.get_cookie_tracking('_ga')!="NaN" ) ? AviviD.get_cookie_tracking('_ga') : AviviD.get_cookie_tracking('gaClientId');
-        let uuid = AviviD.web_uuid === undefined ? AviviD.get_cookie_tracking('AviviD_uuid') : AviviD.web_uuid;
+        let uuid = (AviviD.web_uuid === undefined || AviviD.web_uuid === "_") ? AviviD.get_cookie_tracking('AviviD_uuid') : AviviD.web_uuid;
         let fb_id = AviviD.get_cookie_tracking('_fbp');
         let ip = (AviviD.clientIP===undefined) ? "_" : AviviD.clientIP;
         let is_coupon = ( AviviD.get_cookie_tracking('AviviD_is_coupon')!=="NaN" ) ? AviviD.get_cookie_tracking('AviviD_is_coupon') : 0;

@@ -28,6 +28,7 @@
             };
         };
     };
+
     AviviD.check_addfan_rules = function() {
         //// check black_list first
         var c0 = AviviD.check_addfan_rules_sub(0);
@@ -49,6 +50,7 @@
         };
         return false;
     };
+
     //// should be loaded after event_tracker_gtm.js
     //// Rules in https://docs.google.com/document/d/1YFZf0DYqI1XHuRM8teZx5wy_fcAoWfPplVJjUXGb--U/edit?usp=sharing
     //// API to give the highest prioity coupon
@@ -171,6 +173,31 @@
         });
     };
 
+    //// API get customer is regular or vip or not
+    AviviD.fetch_regular_vip = async function(web_id, uuid) {
+        return new Promise((resolve, reject) => {
+            let url = 'https://asia-east1-hd-crescent.cloudfunctions.net/get_regular_vip'; // https://rhea-cache.advividnetwork.com/api/
+            jQuery.ajax({
+                type: 'GET',
+                url: url,
+                cache: true,
+                dataType: 'json',
+                data: {
+                    'web_id': web_id,
+                    'uuid' : uuid,
+                },
+                success: function (result) {
+                    var result_modify = (result['message']==='Succeed.') ? {'regular': parseInt(result['regular']), 'vip': parseInt(result['vip'])} : {'regular':0, 'vip':0};
+                    resolve(result_modify)
+                },
+                fail: function (xhr, ajaxOptions, thrownError) {
+                    reject(false)
+                },
+            });
+        });
+    };
+    
+
     //// API convert product id to product name and url
     AviviD.fetch_name_url_from_id = async function(web_id, product_id) {
         return new Promise((resolve, reject) => {
@@ -194,10 +221,10 @@
         });
     };
 
-    //// API convert footprint (old)
+    //// API convert id to product name and url (footprint)
     AviviD.fetch_name_url_from_footprint = async function(web_id, id) {
         return new Promise((resolve, reject) => {
-            let url = 'https://rhea-cache.advividnetwork.com/api/ecomHistory'; // https://rhea-cache.advividnetwork.com/api/
+            let url = 'https://rhea-cache.advividnetwork.com/api/coupon/get_name_url_id'; // https://rhea-cache.advividnetwork.com/api/
             jQuery.ajax({
                 type: 'GET',
                 url: url,
@@ -206,16 +233,9 @@
                 data: {
                     'web_id': web_id, 
                     'data'  : id,
-                    'type'  : 'item',
                 },
                 success: function (result) {                  
-                    let name = result[result['item_list']]['title']
-                    let url  = result[result['item_list']]['url']
-                    let result_modify = {'name' : name, 'url' : url}
-                    resolve(result_modify)
-                },
-                error: function (result) {                  
-                    resolve({'name' : '_', 'url' : '_'})
+                    resolve(result)
                 },
                 fail: function (xhr, ajaxOptions, thrownError) {
                     reject(false)
@@ -433,6 +453,7 @@
             console.log("trigger discardCoupon event");
         };
     };
+
     //// send event, AviviD.gtm_event_send('bubble', 'likr', location.href)      
     AviviD.gtm_event_send_st = function(event_name,event_category,event_label){                
         if (AviviD.config_tracking.ga_id != ''){    
@@ -441,7 +462,7 @@
             return false;
         };
         var has_gtm = typeof(gtag) == "undefined"? 0:1;
-        if(has_gtm == 1 ){
+        if(has_gtm == 1){
             try {
             if ("event_ga_id" in AviviD){
                 gtag("config", AviviD.event_ga_id);
@@ -472,6 +493,7 @@
             };
         };
     };
+
     //// click to clipboard message
     AviviD.clickToClipboard_info = function(){
         let coupon_copy_message = '您的折價卷代碼已複製到剪貼簿';
@@ -616,6 +638,7 @@
             
         };
     };
+
     //// load main for coupon
     AviviD.Promotion_coupons = function(title, content, code, timeset, limit, mode=0, is_exit=false){
         var coupon_css =
@@ -1430,8 +1453,19 @@
         //// find customer_type===1
         var data_status_array_filter = data_status_array.filter(x => x.customer_type===1);
     } else if (AviviD.record_user.i_pb===1) {
-        //// find customer_type===2
-        var data_status_array_filter = data_status_array.filter(x => x.customer_type===2);
+        let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+        let pb_customer_type = await AviviD.fetch_regular_vip(AviviD.web_id, uuid);
+        AviviD.addFan.regular_vip = pb_customer_type;
+        var data_status_array_filter = [];
+        //// test case, vip=1, regular=1, => coupon(vip=0,1, regular=0,1) => pass
+        //// test case, vip=0, regular=1, => coupon(vip=0,1, regular=0,1) => pass
+        //// test case, vip=0, regular=0, => coupon(vip=0,1, regular=0,1) => pass
+        //// find customer_type===4 (vip)
+        var data_status_array_filter = (pb_customer_type.vip===1) ? data_status_array.filter(x => x.customer_type===4) : data_status_array_filter;
+        //// find customer_type===3 (regular)
+        var data_status_array_filter = (pb_customer_type.regular===1)&&(data_status_array_filter.length)===0 ? data_status_array.filter(x => x.customer_type===3) : data_status_array_filter;
+        //// find customer_type===2 (old)
+        var data_status_array_filter = (data_status_array_filter.length)===0 ? data_status_array.filter(x => x.customer_type===2) : data_status_array_filter; 
     };
     //// check if exit_coupon or max_revenue exist
     AviviD.addFan.check_max_revenue = data_status_array_filter.filter(x=> x.max_revenue===1).length>=1;
@@ -1460,7 +1494,7 @@
 
     AviviD.addFan.coupon_status = (AviviD.get_urlparam('avivid_preview_coupon')==1)? true : data_status.status; // false: no available coupon, true: yes or preview mode
     AviviD.addFan.coupon_id = data_status.id; // use to get coupon information
-    AviviD.addFan.coupon_customer_type = data_status.customer_type; // 1: new only (exclude is_purchase_brfore=1), 2: old only, 3: exit
+    AviviD.addFan.coupon_customer_type = data_status.customer_type; // 1: new only (exclude is_purchase_brfore=1), 2: old only, 3: regular, 4: vip, 99: exit
     AviviD.addFan.website_type = data_status.website_type; // 0:normal, 1: one-page ecom
     AviviD.addFan.coupon_limit = data_status.coupon_limit;
     if (AviviD.get_urlparam('avivid_preview_coupon')==1) {
@@ -1553,11 +1587,6 @@
             AviviD.addFan.promotion_switch = parseInt(coupon_details.promotion_switch); // 0: normal coupon, 1: promotion type
             AviviD.addFan.promotion_items_title = coupon_details.promotion_items_title; // 0: normal coupon, 1: promotion type
             AviviD.addFan.promotion_items_url = coupon_details.promotion_items_url; // 0: normal coupon, 1: promotion type
-
-            // test
-            // AviviD.addFan.promotion_switch = 1 // 0: normal coupon, 1: promotion type
-            // AviviD.addFan.promotion_items_title = "七彩水晶魔幻配重滑鼠,唐老鴨溜滑板 GTC-52,無線靜音超薄滑鼠,銀雕A5機械電競滑鼠,七彩鬥陣特攻專用滑鼠".split(','); // 0: normal coupon, 1: promotion type
-            // AviviD.addFan.promotion_items_url = "https://www.94monster.com/product/detail/760830,https://www.94monster.com/product/detail/801431,https://www.94monster.com/product/detail/758617,https://www.94monster.com/product/detail/695034,https://www.94monster.com/product/detail/742241".split(','); // 0: normal coupon, 1: promotion type
             AviviD.addFan.promotion_items = []
             for (let i=0; i<AviviD.addFan.promotion_items_title.length; i++) {
                 AviviD.addFan.promotion_items[i] = {"name": AviviD.addFan.promotion_items_title[i], "url": AviviD.addFan.promotion_items_url[i]};
@@ -1637,11 +1666,6 @@
         AviviD.addFan.promotion_switch_exit = parseInt(coupon_details_exit.promotion_switch); // 0: normal coupon, 1: promotion type
         AviviD.addFan.promotion_items_title_exit = coupon_details_exit.promotion_items_title; // 0: normal coupon, 1: promotion type
         AviviD.addFan.promotion_items_url_exit = coupon_details_exit.promotion_items_url; // 0: normal coupon, 1: promotion type
-
-        // test
-        // AviviD.addFan.promotion_switch_exit = 1 // 0: normal coupon, 1: promotion type
-        // AviviD.addFan.promotion_items_title_exit = "七彩水晶魔幻配重滑鼠,唐老鴨溜滑板 GTC-52,無線靜音超薄滑鼠,銀雕A5機械電競滑鼠,七彩鬥陣特攻專用滑鼠".split(','); // 0: normal coupon, 1: promotion type
-        // AviviD.addFan.promotion_items_url_exit = "https://www.94monster.com/product/detail/760830,https://www.94monster.com/product/detail/801431,https://www.94monster.com/product/detail/758617,https://www.94monster.com/product/detail/695034,https://www.94monster.com/product/detail/742241".split(','); // 0: normal coupon, 1: promotion type
         AviviD.addFan.promotion_items_exit = [];
         for (let i=0; i<AviviD.addFan.promotion_items_title_exit.length; i++) {
             AviviD.addFan.promotion_items_exit[i] = {"name": AviviD.addFan.promotion_items_title_exit[i], "url": AviviD.addFan.promotion_items_url_exit[i]};
@@ -1746,7 +1770,7 @@
             return AviviD.addFan.AviviD_is_addfan_b===0 && AviviD.record_user.ps>=3;
         };
     };
-
+    AviviD.addFan.AviviD_is_addfan_b = ( AviviD.get_cookie_tracking('AviviD_is_addfan_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_addfan_b')) : 0;
     //// 1. check available ad, if not sending coupon
     if (AviviD.check_allow_addfan()) {
         var ad_status = await AviviD.fetch_ad_status(AviviD.web_id);

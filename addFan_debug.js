@@ -187,7 +187,7 @@
                     'uuid' : uuid,
                 },
                 success: function (result) {
-                    var result_modify = (result['message']==='Succeed.') ? {'regular': result['regular'], 'vip': result['vip']} : {'regular':'0', 'vip':'0'};
+                    var result_modify = (result['message']==='Succeed.') ? {'regular': parseInt(result['regular']), 'vip': parseInt(result['vip'])} : {'regular':0, 'vip':0};
                     resolve(result_modify)
                 },
                 fail: function (xhr, ajaxOptions, thrownError) {
@@ -1453,14 +1453,17 @@
         //// find customer_type===1
         var data_status_array_filter = data_status_array.filter(x => x.customer_type===1);
     } else if (AviviD.record_user.i_pb===1) {
-        var uuid = AviviD.get_cookie_tracking('AviviD_uuid');
-        var pb_customer_type = await AviviD.fetch_regular_vip(AviviD.web_id, uuid);
+        let uuid = AviviD.get_cookie_tracking('AviviD_uuid');
+        let pb_customer_type = await AviviD.fetch_regular_vip(AviviD.web_id, uuid);
         AviviD.addFan.regular_vip = pb_customer_type;
         var data_status_array_filter = [];
+        //// test case, vip=1, regular=1, => coupon(vip=0,1, regular=0,1) => pass
+        //// test case, vip=0, regular=1, => coupon(vip=0,1, regular=0,1) => pass
+        //// test case, vip=0, regular=0, => coupon(vip=0,1, regular=0,1) => pass
         //// find customer_type===4 (vip)
         var data_status_array_filter = (pb_customer_type.vip===1) ? data_status_array.filter(x => x.customer_type===4) : data_status_array_filter;
         //// find customer_type===3 (regular)
-        var data_status_array_filter = (pb_customer_type.regular===1) ? data_status_array.filter(x => x.customer_type===3) : data_status_array_filter;
+        var data_status_array_filter = (pb_customer_type.regular===1)&&(data_status_array_filter.length)===0 ? data_status_array.filter(x => x.customer_type===3) : data_status_array_filter;
         //// find customer_type===2 (old)
         var data_status_array_filter = (data_status_array_filter.length)===0 ? data_status_array.filter(x => x.customer_type===2) : data_status_array_filter; 
     };
@@ -1767,7 +1770,7 @@
             return AviviD.addFan.AviviD_is_addfan_b===0 && AviviD.record_user.ps>=3;
         };
     };
-
+    AviviD.addFan.AviviD_is_addfan_b = ( AviviD.get_cookie_tracking('AviviD_is_addfan_b')!=="NaN" ) ? parseInt(AviviD.get_cookie_tracking('AviviD_is_addfan_b')) : 0;
     //// 1. check available ad, if not sending coupon
     if (AviviD.check_allow_addfan()) {
         var ad_status = await AviviD.fetch_ad_status(AviviD.web_id);

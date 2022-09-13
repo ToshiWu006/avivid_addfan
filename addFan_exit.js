@@ -1249,7 +1249,8 @@
                     //// first time to accept coupon
                     // 1.show coupon (main page)
                     AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, AviviD.addFan.coupon_limit, 0);
-
+                    // let discardCoupon event as coupon impression
+                    AviviD.LikrEventTrackingDiscardCoupon();
                     // if (AviviD.check_addfan_rules()) {
                     //     AviviD.Promotion_coupons(AviviD.addFan.coupon_title, AviviD.addFan.coupon_description, AviviD.addFan.coupon_code, AviviD.addFan.coupon_setTimer, AviviD.addFan.coupon_limit, 0);
                     // }

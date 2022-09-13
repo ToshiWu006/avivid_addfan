@@ -1306,7 +1306,7 @@
             AviviD.LikrEventTrackingAcceptCoupon(is_exit);
             AviviD.gtm_event_send_st('aceept_coupon_'+coupon_id, 'likr_event', location.href);
             AviviD.set_cookie_minutes_tracking("AviviD_is_coupon",0,0.1); // continue session
-        } else { // with time limit                        
+        } else { // with time limit
             //// initialize for AviviD.startCountDown()
             AviviD.addFan.AviviD_c_t_r = AviviD.addFan.AviviD_c_t_r===undefined ? 60*setTimer : AviviD.addFan.AviviD_c_t_r;
             // AviviD.addFan.AviviD_c_t_r_min = typeof(AviviD.addFan.AviviD_c_t_r_min)==='undefined' ? AviviD.addFan.coupon_setTimer : AviviD.addFan.AviviD_c_t_r_min;
@@ -1318,6 +1318,8 @@
                 AviviD.LikrEventTrackingAcceptCoupon(is_exit);
                 AviviD.addFan.had_triggered_coupon = false;
                 AviviD.gtm_event_send_st('aceept_coupon_'+coupon_id, 'likr_event', location.href);
+                AviviD.addFan.AviviD_is_coupon = is_exit ? 2 : 1;
+                AviviD.set_cookie_minutes_tracking("AviviD_is_coupon", AviviD.addFan.AviviD_is_coupon, 60); // continue session
             };
             // show secondary page and timer
             setTimeout(()=>{
@@ -1695,10 +1697,13 @@
                     }, 500);
                 } else if (AviviD.settings.before_page_enable!=="1" && AviviD.get_feature_domain(document.referrer)!=="gaii.ai" && AviviD.get_feature_domain(location.href)!==AviviD.get_feature_domain(document.referrer)) {
                     // no before_page and exit current domain
-                    window.history.pushState("", "", window.location.href + "#");
+                    // window.history.pushState("", "", window.location.href + "#");
+                    window.history.pushState("", "", window.location.href);
                     window.addEventListener("popstate", e=> {
                         if (!AviviD.addFan.showing && AviviD.addFan.AviviD_is_coupon_e===0) {
                             AviviD.Promotion_coupons(AviviD.addFan.coupon_title_exit, AviviD.addFan.coupon_description_exit, AviviD.addFan.coupon_code_exit, AviviD.addFan.coupon_setTimer_exit, AviviD.addFan.coupon_limit_exit, 0, true);
+                            //// add impression
+                            AviviD.LikrEventTrackingDiscardCoupon(true);
                             AviviD.addFan.showing = true;
                             clearTimeout(AviviD.addFan.coupon_timeout);
                             AviviD.likrTimer.clearTimer();

@@ -2084,19 +2084,22 @@
                             height: 15vw;
                             background-color: `+AviviD.addFan.ad_btn_color+`;
                             cursor: pointer;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
 
                         }
-                        .avivid_logo {
-                            position: relative;
-                            top: 1vw;
-                            left: 30vw;
+                        .avivid_addfan_logo {
+                            position: absolute;
+                            bottom: 5px;
+                            right: 5px;
+                            width: 50px;
                         }
                         .avivid_addfan_text {
-                            position: relative;
-                            top: 2vw;
                             font-size: 5vw;
                             font-weight: 700;
                             color: white;
+                            margin: 0;
                         }
                     }
 
@@ -2153,19 +2156,22 @@
                             height: 10vw;
                             background-color: `+AviviD.addFan.ad_btn_color+`;
                             cursor: pointer;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
 
                         }
-                        .avivid_logo {
-                            position: relative;
-                            top: 1vw;
-                            left: 21vw;
+                        .avivid_addfan_logo {
+                            position: absolute;
+                            bottom: 5px;
+                            right: 5px;
+                            width: 50px;
                         }
                         .avivid_addfan_text {
-                            position: relative;
-                            top: 2vw;
                             font-size: 4vw;
                             font-weight: 700;
                             color: white;
+                            margin: 0;
                         }
                     }
                     </style>
@@ -2180,7 +2186,7 @@
                             </button>
                             <button class="avivid_line_fans_btn" onclick="AviviD.trigger_af('` + AviviD.addFan.ad_btn_url + `', 1)">
                                 <p class="avivid_addfan_text">`+AviviD.addFan.ad_btn_text+`</p>
-                                <img class="avivid_logo" src="https://rhea-cache.advividnetwork.com/coupon/AviviD_logo.svg"></img>
+                                <img class="avivid_addfan_logo" src="https://rhea-cache.advividnetwork.com/coupon/AviviD_logo.svg"></img>
                             </button>
                         </div>
                     </div>`

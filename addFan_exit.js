@@ -1052,6 +1052,10 @@
 
                     jQuery('head').append(coupon_css);
                     jQuery('body').append(main_div);
+                    if (coupon_code_mode===3 || coupon_url!=="_") {// url-type coupon
+                        jQuery('.avivid_coupon_description').addClass('avivid_coupon_description_locked');
+                        jQuery('.avivid_coupon, .avivid_coupon_code, .avivid_coupon_help').addClass('hidden');
+                    };
                     //// append coupon_limit if existing
                     AviviD.appendCouponLimit(limit);
                     // AviviD.update_couponUI();

@@ -150,7 +150,7 @@
             });
         });
     };
-    
+
     //// API to give not repeating batch coupon details (use coupon id)
     AviviD.fetch_addFan_batch_coupon_detials = async function (coupon_id) {
         return new Promise((resolve, reject) => {
@@ -504,10 +504,10 @@
                 };
                 gtag("event",
                     event_name, {
-                        "event_category": event_category,
-                        "event_label": event_label,
-                        "nonInteraction": true
-                    });
+                    "event_category": event_category,
+                    "event_label": event_label,
+                    "nonInteraction": true
+                });
             } catch (e) {
                 AviviD.console_logs(e);
             };
@@ -795,11 +795,12 @@
                 -webkit-animation: fade 5s infinite;
             }
             .avivid_coupon_cap{
-                background: url('https://rhea-cache.advividnetwork.com/coupon/Frame_40.png');
+                background: url('https://rhea-cache.advividnetwork.com/coupon/img/mobile_coupon_cap.png');
                 background-repeat: no-repeat;
-                width: 100vw;
-                height: 65vw;
-                background-size: 90%;
+                height: 144px;
+                background-size:100%;
+                width: 80.7vw;
+                max-width:278px;
                 background-position: top center;
             }
             .avivid_coupon_content_wraper{
@@ -808,8 +809,9 @@
                 align-items: center;
                 background: #fff;
                 width: 80.7vw;
+                max-width:278px;
                 margin-left: 0.5vw;
-                padding: 0 5vw 20px 5vw;
+                padding: 0 2vw 20px 2vw;
                 border-radius: 0 0 30px 30px;
                 box-shadow: 0px 0px 10px 0px rgb(255 255 255 / 50%);
                 box-sizing: border-box;
@@ -817,17 +819,18 @@
                 top: -1px;
             }
             .avivid_coupon_title{             
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
-                font-weight: 1000;
-                font-size: 20px;
-                line-height: 26px;
+                font-weight: Bold;
+                font-size: 16px;
+                line-height: 140%;
+                letter-spacing:1px;
                 /* or 130% */
                 text-align: center;
                 color: #F78CA0;
             }
             .avivid_coupon_title_product{             
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 1000;
                 font-size: 20px;
@@ -838,24 +841,26 @@
             }
             @media only screen and (max-width: 400px) {
                 .avivid_coupon_title  {
-                    font-size: 18px;
+                    font-size: 16px;
+                    letter-spacing:1px;
                 }
             }
             @media only screen and (max-width: 350px) {
                 .avivid_coupon_title  {
-                    font-size: 17px;
+                    font-size: 16px;
                 }
             }
             .avivid_coupon_description{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
-                font-weight: 300;
-                font-size: 15px;
-                line-height: 21px;
+                font-weight: Regular;
+                font-size: 30px;
+                line-height: 140%;
+                letter-spacing:0px;
                 /* or 140% */
                 text-align: center;
                 color: #606060;
-                margin: 1vh 0;
+                margin: 16px 0 0 0; 
                 display: -webkit-box;
                 -webkit-line-clamp: 6;
                 -webkit-box-orient: vertical;
@@ -865,7 +870,7 @@
             }
             @media only screen and (max-width: 400px) {
                 .avivid_coupon_description  {
-                    font-size: 15px;
+                    font-size: 30px;
                 }
             }
             .avivid_coupon_description_locked{
@@ -873,31 +878,32 @@
                 margin: 40px 0;
             }
             .avivid_coupon{         
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: normal;
                 font-size: 15px;
                 line-height: 15px;
                 text-align: center;                
                 color: #606060;           
-                margin-top: 2vh;
+                /* margin-top: 2vh; */
             }
             .avivid_coupon_code{       
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
-                font-weight: 900;
-                font-size: 28px;
-                line-height: 28px;
+                font-weight: Bold;
+                font-size: 24px;
+                line-height: 140%;
+                letter-spacing:2px;
                 text-align: center;           
                 color: #606060;            
-                margin: 5px 0;
+                margin:24px 0;
             }
             .avivid_coupon_help{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 300;
                 font-size: 10px;
-                line-height: 16px;
+                line-height: 140%;
                 /* identical to box height, or 160% */
                 text-align: center;      
                 color: #606060;
@@ -907,21 +913,23 @@
                 .avivid_coupon{
                 }
                 .avivid_coupon_code{
+                    font-size:24px;
                 }
                 .avivid_coupon_help{
                 }
             }
             .avivid_coupon_sep{
-                width: 70vw;
+                width: 100%;
                 height: 0px;
                 border: 1px dashed #606060;
+                margin: 5px 0;
             }
             .avivid_coupon_alert{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 300;
                 font-size: 10px;
-                line-height: 14px;
+                line-height: 140%;
                 /* or 175% */
                 text-align: center;
                 color: #606060;
@@ -945,11 +953,16 @@
 
             @media (min-width: 700px) {
                 .avivid_coupon_cap{
+                    background: url('https://rhea-cache.advividnetwork.com/coupon/img/pc_coupon_cap.png');
                     filter: drop-shadow(-1px -1px 9px rgba(0, 0, 0, 0.7));
+                    max-width:416px;
+                    background-size: 100%;
+                    height: 260px;
                 }
 
                 .avivid_coupon_content_wraper{
                     box-shadow: 2px 8px 7px 2px rgb(0 0 0 / 30%), 0 6px 6px 0 rgb(0 0 0 / 19%);
+                    max-width:416px;
                 }
 
                 .avivid_coupon_counter{
@@ -983,15 +996,13 @@
                 }
 
                 .max_revenue .avivid_coupon_cap {
-                    height: 20vw;
-                    background-size: 30%;
+                    
                 }
                 .max_revenue .avivid_coupon_content_wraper{
-                    width: 26.9vw;
                     margin-left: 0.1vw;
                 }
                 .max_revenue .avivid_coupon_sep{
-                    width: 27vw;
+                    width: 100%;
                 }
                 .max_revenue .avivid_coupon_discard {
                     margin-right: 1vw;
@@ -1002,26 +1013,26 @@
                 }
 
                 .exit_coupon .avivid_coupon_cap {
-                    height: 20vw;
-                    background-size: 30%;
+                    
                 }
                 .exit_coupon .avivid_coupon_content_wraper{
-                    width: 26.9vw;
                     margin-left: 0.3vw;
                 }
                 .exit_coupon .avivid_coupon_sep{
-                    width: 27vw;
+                    width: 100%;
                 }
                 .exit_coupon .avivid_coupon_discard {
                     margin-right: 1vw;
                 }
 
                 .avivid_coupon_title{
-                    font-size: 12px;
+                    font-size: 28px;
                 }
 
                 .avivid_coupon_description{
-                    transform: scale(0.8);
+                    /* transform: scale(0.8);*/
+                    font-size:36px;
+                    margin: 24px 0 0 0;
                 }
 
                 .avivid_coupon{
@@ -1029,16 +1040,19 @@
                 }
 
                 .avivid_coupon_code{
-                    font-size: 20px;
-                    transform: scale(0.8);
+                    font-size: 36px;
+                    /* transform: scale(0.8); */
+                    margin:48px 0;
                 }
 
                 .avivid_coupon_help{
                     transform: scale(0.8);
+                    font-size:16px;
                 }
 
                 .avivid_coupon_alert{
                     transform: scale(0.8);
+                    font-size:16px;
                 }
             }
 
@@ -1058,26 +1072,24 @@
                 }
 
                 .max_revenue .avivid_coupon_cap {
-                    height: 17vw;
-                    background-size: 23%;
+                    
+
                 }
                 .max_revenue .avivid_coupon_content_wraper{
-                    width: 20.6vw;
                 }
                 .max_revenue .avivid_coupon_sep{
-                    width: 21vw;
+                    width: 100%;
                 }
                 
                 .exit_coupon .avivid_coupon_cap {
-                    height: 17vw;
-                    background-size: 23%;
+                    
+
                 }
                 .exit_coupon .avivid_coupon_content_wraper{
-                    width: 20.6vw;
                     margin-left: 0.1vw;
                 }
                 .exit_coupon .avivid_coupon_sep{
-                    width: 21vw;
+                    width: 100%;
                 }
             }
         }
@@ -1201,11 +1213,12 @@
                 -webkit-animation: fade 5s infinite;
             }
             .avivid_coupon_cap{
-                background: url('https://rhea-cache.advividnetwork.com/coupon/Frame_40.png');
+                background: url('https://rhea-cache.advividnetwork.com/coupon/img/mobile_coupon_cap.png');
                 background-repeat: no-repeat;
-                width: 100vw;
-                height: 65vw;
-                background-size: 90%;
+                background-size:100%;
+                width: 80.7vw;
+                max-width:278px;
+                height: 144px;
                 background-position: top center;
             }
             .avivid_coupon_content_wraper{
@@ -1214,8 +1227,9 @@
                 align-items: center;
                 background: #fff;
                 width: 80.65vw;
+                max-width:278px;
                 margin-left: 0.3vw;
-                padding: 0 5vw 20px 5vw;
+                padding: 0 2vw 20px 2vw;
                 border-radius: 0 0 30px 30px;
                 box-shadow: 0px 0px 10px 0px rgb(255 255 255 / 50%);
                 box-sizing: border-box;
@@ -1223,17 +1237,18 @@
                 top: -1px;
             }
             .avivid_coupon_title{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
-                font-weight: 1000;
-                font-size: 20px;
-                line-height: 26px;
+                font-weight: Bold;
+                font-size: 16px;
+                line-height: 140%;
+                letter-spacing:1px;
                 /* or 130% */
                 text-align: center;
                 color: #F78CA0;
             }
             .avivid_coupon_title_product{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 1000;
                 font-size: 20px;
@@ -1243,15 +1258,15 @@
                 color: #F78CA0;
             }
             .avivid_coupon_description{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 300;
-                font-size: 15px;
-                line-height: 21px;
+                font-size: 30px;
+                line-height: 140%;
                 /* or 140% */
                 text-align: center;
                 color: #606060;
-                margin: 1vh 0;
+                margin: 16px 0 0 0;
                 display: -webkit-box;
                 -webkit-line-clamp: 6;
                 -webkit-box-orient: vertical;
@@ -1260,50 +1275,52 @@
                 white-space: pre-line;
             }
             .avivid_coupon_description_locked{
-                font-size: 17px;
+                font-size: 30px;
                 margin: 40px 0;
             }
             .avivid_coupon{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: normal;
                 font-size: 15px;
                 line-height: 15px;
                 text-align: center;                
                 color: #606060;           
-                margin-top: 2vh;
+                /* margin-top: 2vh; */
             }
             .avivid_coupon_code{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
-                font-weight: 900;
-                font-size: 28px;
-                line-height: 28px;
+                font-weight: Bold;
+                letter-spacing:2px;
+                font-size: 24px;
+                line-height: 140%;
                 text-align: center;       
                 color: #606060;            
-                margin: 5px 0;
+                margin:24px 0;
             }
             .avivid_coupon_help{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 300;
                 font-size: 10px;
-                line-height: 16px;
+                line-height: 140%;
                 /* identical to box height, or 160% */
                 text-align: center;
                 color: #606060;
                 margin: 1vh 0;
             }
             .avivid_coupon_sep{
-                width: 40vw;
+                width: 100%;
                 border: 1px dashed #606060;
+                margin: 5px 0;
             }
             .avivid_coupon_alert{
-                font-family: Swei Gothic CJK TC;
+                font-family: Noto sans;
                 font-style: normal;
                 font-weight: 300;
                 font-size: 10px;
-                line-height: 14px;
+                line-height: 140%;
                 /* or 175% */
                 text-align: center;
                 color: #606060;
@@ -1327,11 +1344,16 @@
 
             @media (min-width: 700px) {
                 .avivid_coupon_cap{
+                    background: url('https://rhea-cache.advividnetwork.com/coupon/img/pc_coupon_cap.png');
                     filter: drop-shadow(-1px -1px 9px rgba(0, 0, 0, 0.7));
+                    max-width:416px;
+                    background-size: 100%;
+                    height: 260px;
                 }
 
                 .avivid_coupon_content_wraper{
                     box-shadow: 2px 8px 7px 2px rgb(0 0 0 / 30%), 0 6px 6px 0 rgb(0 0 0 / 19%);
+                    max-width:416px;
                 }
                 
                 .avivid_coupon_counter{
@@ -1369,15 +1391,13 @@
                 }
 
                 .max_revenue .avivid_coupon_cap {
-                    height: 20vw;
-                    background-size: 30%;
+                    
                 }
                 .max_revenue .avivid_coupon_content_wraper{
-                    width: 26.9vw;
                     margin-left: 0.1vw;
                 }
                 .max_revenue .avivid_coupon_sep{
-                    width: 27vw;
+                    width: 100%;
                 }
                 .max_revenue .avivid_coupon_discard {
                     margin-right: 1vw;
@@ -1388,25 +1408,25 @@
                 }
 
                 .exit_coupon .avivid_coupon_cap {
-                    height: 20vw;
-                    background-size: 30%;
+               
                 }
                 .exit_coupon .avivid_coupon_content_wraper{
-                    width: 26.9vw;
                     margin-left: 0.3vw;
                 }
                 .exit_coupon .avivid_coupon_sep{
-                    width: 27vw;
+                    width: 100%;
                 }
                 .exit_coupon .avivid_coupon_discard {
                     margin-right: 1vw;
                 }
                 .avivid_coupon_title{
-                    font-size: 12px;
+                    font-size: 28px;
                 }
 
                 .avivid_coupon_description{
-                    transform: scale(0.8);
+                    /* transform: scale(0.8);*/
+                    font-size:36px;
+                    margin: 24px 0 0 0;
                 }
 
                 .avivid_coupon{
@@ -1414,16 +1434,19 @@
                 }
 
                 .avivid_coupon_code{
-                    font-size: 20px;
-                    transform: scale(0.8);
+                    font-size:36px;
+                    /* transform: scale(0.8);*/
+                    margin:48px 0;
                 }
 
                 .avivid_coupon_help{
                     transform: scale(0.8);
+                    font-size:16px;
                 }
 
                 .avivid_coupon_alert{
                     transform: scale(0.8);
+                    font-size:16px;
                 }
             }
 
@@ -1445,27 +1468,23 @@
                 }
 
                 .max_revenue .avivid_coupon_cap {
-                    height: 17vw;
-                    background-size: 23%;
+                    
                 }
                 .max_revenue .avivid_coupon_content_wraper{
-                    width: 20.6vw;
                 }
                 .max_revenue .avivid_coupon_sep{
-                    width: 21vw;
+                    width: 100%;
                 }
 
 
                 .exit_coupon .avivid_coupon_cap {
-                    height: 17vw;
-                    background-size: 23%;
+                    
                 }
                 .exit_coupon .avivid_coupon_content_wraper{
-                    width: 20.6vw;
                     margin-left: 0.1vw;
                 }
                 .exit_coupon .avivid_coupon_sep{
-                    width: 21vw;
+                    width: 100%;
                 }
             }
         }
@@ -1481,8 +1500,8 @@
                             <div>` + title + `</div>
                         </div>
                         <div class='avivid_coupon_description'>` + content + `</div>
-                        <div class='avivid_coupon'>優惠碼</div>
-                        <div class='avivid_coupon_code'>` + code + `</div>
+                        <div class='avivid_coupon'></div>
+                        <div class='avivid_coupon_code'>優惠碼` + code + `</div>
                         <div class='avivid_coupon_help'>請在購物車頁面「請輸入優惠碼」中輸入以上折扣代碼</div>
                         <div class='avivid_coupon_sep'></div>
                         <div class='avivid_coupon_alert'></div>     
@@ -1531,7 +1550,7 @@
         // if (AviviD.get_cookie_tracking('AviviD_is_coupon') == '1' || AviviD.get_cookie_tracking('AviviD_is_coupon') == '2' || AviviD.get_cookie_tracking('AviviD_is_coupon_b') == '1' && jQuery('.avivid_main_page').css('display') == 'none') {
         //     AviviD.show_secondary_page();
         // }
-        
+
         //// append coupon_limit if existing
         var coupon_code_mode = is_exit ? AviviD.addFan.coupon_code_mode_exit : AviviD.addFan.coupon_code_mode;
         var coupon_url = is_exit ? AviviD.addFan.coupon_url_exit : AviviD.addFan.coupon_url;
@@ -1550,7 +1569,7 @@
         if (mode == 1) { // 小鬧鐘
             //// go to next page or click multiple times at the same page, hide main page, show secondary page
             AviviD.AcceptCoupon(false, timeset, is_exit); // option to disable clickToClipboard
-            AviviD.show_secondary_page();       
+            AviviD.show_secondary_page();
         } else { // 折價卷主視窗
             //// first time to accept coupon, show main page, hide secondary page
             jQuery('.avivid_main_page').show();
@@ -2393,7 +2412,7 @@
                 AviviD.addFan.ad_btn_text = ad_details.ad_btn_text; // button text to display
                 AviviD.addFan.ad_btn_color = ad_details.ad_btn_color; // button color
                 AviviD.onclick_redirect = function (url, mode = 0) { // 0:clicking a link, 1:open new tab               
-                    (mode === 0) ? window.location.href(url): window.open(url, '_blank');
+                    (mode === 0) ? window.location.href(url) : window.open(url, '_blank');
                     jQuery(".avivid_addfan_page").hide(500);
                 };
                 AviviD.trigger_ad = function (url) { // 0:clicking a link, 1:open new tab       
@@ -2851,7 +2870,7 @@
             AviviD.set_coupon_disable();
         });
     };
-    if (AviviD.web_id === 'washcan' || AviviD.web_id === 'hidesan' || AviviD.web_id === 'lzl'){
+    if (AviviD.web_id === 'washcan' || AviviD.web_id === 'hidesan' || AviviD.web_id === 'lzl') {
         function dynamicLoadCss(url) {
             var head = document.getElementsByTagName('head')[0];
             var mycss = document.createElement('link');
@@ -2864,7 +2883,7 @@
             dynamicLoadCss(`https://rhea-cache.advividnetwork.com/coupon/custom_css/${AviviD.web_id}/avivid_common.css`);
         }
     }
-    if (AviviD.web_id === 'kfan'){
+    if (AviviD.web_id === 'kfan') {
         function dynamicLoadCss(url) {
             var head = document.getElementsByTagName('head')[0];
             var mycss = document.createElement('link');

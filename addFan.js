@@ -663,14 +663,19 @@
             product_name = product_name.slice(0, 8) + '...';
         };
         if (product_name !== '_') {
-            var product_div = `<a class=avivid_coupon_title_product href="` + product_url + `" onclick="AviviD.AcceptCoupon(true, is_exit=` + is_exit + `)"><div>` + product_name + `限時優惠</div></a>`;
+            if (AviviD.addFan.check_cart_coupon) {
+                jQuery('.avivid_coupon_title').text('您的購物車商品限時優惠中！')
+                jQuery('.avivid_coupon_title').css("font-size", "26px");
+            }
+            var product_div = `<a class=avivid_coupon_title_product href="` + product_url + `?avivid_triggered_coupon=1" onclick="AviviD.AcceptCoupon(true, is_exit=` + is_exit + `)"><div>` + product_name + `限時優惠</div></a>`;
             var time_limit_div = `<div id="time-limit-text">(` + timeset + ` mins)</div>`;
             //// promotion coupon
             jQuery('#time-limit-text').remove();
             jQuery('.avivid_coupon_title').append(product_div);
             jQuery('.avivid_coupon_description').text(coupon_description);
-            jQuery('.avivid_coupon_title').append(time_limit_div);
-
+            if (timeset !== 0) {
+                jQuery('.avivid_coupon_title').append(time_limit_div);
+            };
         };
     };
 
@@ -1559,7 +1564,7 @@
             jQuery('.avivid_coupon, .avivid_coupon_code, .avivid_coupon_help').addClass('hidden');
         };
         AviviD.appendCouponLimit(limit);
-        if (AviviD.addFan.promotion_switch === 1) {
+        if (AviviD.addFan.promotion_switch === 1 || AviviD.addFan.check_cart_coupon) {
             AviviD.update_couponUI(is_exit, timeset);
         };
         // AviviD.update_couponUI(is_exit);
@@ -1588,6 +1593,16 @@
             jQuery('.avivid_main_page').addClass("exit_coupon");
             jQuery('.avivid_main_page').removeClass("max_revenue");
             jQuery('.avivid_main_page').css('background', 'rgb(0,0,0,0.8)');
+        }
+
+        // 若未輸入description則隱藏
+        if (AviviD.addFan.coupon_description === '_') {
+            jQuery('.avivid_coupon_description').hide();
+        }
+
+        // 若未設定時間則隱藏
+        if (AviviD.addFan.coupon_setTimer === 0) {
+            jQuery('#time-limit-text').hide();
         }
     };
     AviviD.ClickToClipboard = function (text) {
@@ -1822,6 +1837,7 @@
     // data_status_array = data_status_array.filter(x=> x.max_revenue!==1) // filter out max_revenue
     var data_status_array = await AviviD.fetch_coupon_status_all(AviviD.web_id);
     AviviD.addFan.check_exit_coupon = data_status_array.filter(x => x.customer_type === 99).length >= 1;
+    AviviD.addFan.check_cart_coupon = data_status_array.filter(x => x.customer_type === 5).length >= 1;
 
     //// without, do normally
     //// choose corresponding coupon using AviviD.record_user.i_pb
@@ -1843,18 +1859,33 @@
         //// find customer_type===2 (old)
         var data_status_array_filter = (data_status_array_filter.length) === 0 ? data_status_array.filter(x => x.customer_type === 2) : data_status_array_filter;
     };
-    //// check if exit_coupon or max_revenue exist
-    AviviD.addFan.check_max_revenue = data_status_array_filter.filter(x => x.max_revenue === 1).length >= 1;
+    //// check if exit_coupon
     if (AviviD.addFan.check_exit_coupon) {
         // use original array
         // data_status_array_filter = data_status_array.filter(x=> x.customer_type===99);
         var data_status_exit = data_status_array.filter(x => x.customer_type === 99)[0];
     }
+    /// if any cart's item can be parsed and cart_coupon exist, direct load cart_coupon
+    var cart_id = AviviD.get_cookie_tracking("AviviD_cart_id") == 'NaN' ? 'NaN' : AviviD.get_cookie_tracking("AviviD_cart_id").split(',');
+    if (cart_id !== 'NaN' && AviviD.addFan.check_cart_coupon) {
+        AviviD.addFan.check_cart_coupon = false
+        for (let i = 0; i < cart_id.length; i++) {
+            var result = await AviviD.fetch_name_url_from_id(AviviD.web_id, cart_id[i]);
+            if (result['name'] !== "_") {
+                data_status_array_filter = data_status_array.filter(x => x.customer_type === 5);
+                AviviD.addFan.check_cart_coupon = true
+                break;
+            };
+        };
+    };
+    if (!AviviD.addFan.check_cart_coupon) {
+        data_status_array_filter = data_status_array_filter.filter(x => x.customer_type != 5);
+    }
+    //// with max_revenue activity, direct load coupon
+    AviviD.addFan.check_max_revenue = data_status_array_filter.filter(x => x.max_revenue === 1).length >= 1;
     if (AviviD.addFan.check_max_revenue) {
-        //// with max_revenue activity, direct load coupon
         data_status_array_filter = data_status_array_filter.filter(x => x.max_revenue === 1);
     };
-
     if (data_status_array_filter.length === 0) {
         var data_status = {
             status: false
@@ -2010,7 +2041,6 @@
                     if (AviviD.addFan.check_max_revenue) {
                         // console.log("wait 12s")
                         AviviD.addFan.coupon_timeout = setTimeout(() => {
-
                             if (AviviD.likrTimer === undefined) {
                                 setTimeout(function () {
                                     AviviD.addFan.coupon_timeout();
